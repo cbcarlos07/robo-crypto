@@ -1,10 +1,10 @@
 const operation = require("../db/model/operation");
 const Repository = require("./Repository");
 
-class OperationRepository extends Repository{
+class OperationRSIRepository extends Repository{
     constructor(model){
         super(model)
     }
 }
 
-module.exports = new OperationRepository(operation)
+module.exports = new OperationRSIRepository(operation)

@@ -1,23 +1,26 @@
 require('dotenv').config()
 const axios = require('axios')
 const {format} = require('date-fns')
-const crypto = require('crypto')
+
 const { CronJob } = require('cron')
 
-const {save, errorFn} = require('./file')
+const {save} = require('./file')
 const operationService = require('./services/operation.service')
 const connect = require('./db/connection')
 const errorService = require('./services/error.service')
+const newOrder = require('./utils/order')
 
 connect()
 
-const { API_KEY, SECRET_KEY } = process.env
+const { IS_OPENED_RSI } = process.env
 
 const SYMBOL = 'BTCUSDT'
 const PERIOD = 14
 const QUANTITY = '0.001'
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
 const API_URL = 'https://testnet.binance.vision' //'https://testnet.binance.vision'; //https://api.binance.com
+const STRATEGY = 'RSI'
+
 
 let isOpened = false
 
@@ -64,50 +67,17 @@ const RSI = (prices, period) => {
 }
 
 
-const newOrder = (symbol, quantity, side) => {
-    return new Promise(async (resolve, reject)=>{
 
-        const order = {symbol, quantity, side}
-        order.type = 'MARKET'
-        order.timestamp = Date.now()
-    
-        const signature = crypto
-                            .createHmac('sha256', SECRET_KEY )
-                            .update( new URLSearchParams(order).toString() )
-                            .digest('hex')
-    
-        order.signature = signature
-    
-        try {
-            const { data } = await axios.post(
-                                        `${API_URL}/api/v3/order`,
-                                        new URLSearchParams(order).toString(),
-                                        {
-                                            headers: {'X-MBX-APIKEY' : API_KEY}
-                                        }
-                                    )
-            console.log(data);
-            save( `${JSON.stringify( data,null, 2 )}\n\n` )
-            await operationService.save( data )
-        } catch (error) {
-            const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
-            console.log('deu erro', date);
-            console.log('deu erro', error.response.data);
-            let content = `Data: ${date}\n`
-            content += `${JSON.stringify( error.response.data, null, 2 )}\n\n`
-            errorFn(content)
-            await errorService.save( error.response.data )
-        }
-        resolve({})
-    })
-}
 
 const start = async () => {
+    console.log('IS_OPENED',IS_OPENED_RSI);
+    
+    isOpened = IS_OPENED_RSI == 'true'
     let content = ''
     const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${SYMBOL}`)
     const candle = data[ data.length - 1 ]
     const lastPrice = parseFloat( candle[4] ) 
-    //console.clear()
+    console.clear()
     const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
     console.log(date);
     content = `Data: ${date}\n`
@@ -122,24 +92,39 @@ const start = async () => {
     console.log('Já comprei', isOpened);
     
     
-    // newOrder(SYMBOL, QUANTITY, SIDE.SELL).then(() =>{
-    //     process.exit(0)
+    // newOrder(SYMBOL, QUANTITY, SIDE.SELL).then(data =>{
+    //     operationService.save({...data, strategy: STRATEGY})
+    //         .then(data => console.log('data',data))
+    //         .catch(err => {
+    //             console.log('err',err)
+    //         })
+        
+    //     setTimeout(() => {
+    //         process.exit(0)    
+    //     }, 3000);
+        
     // })
     
     
     if( rsi < 30 && !isOpened ){
         console.log('Sobrevendido, hora de comprar');
         isOpened = true
+        saveEnvVariable('IS_OPENED', isOpened);
         content += `Comprar\n\n`
         newOrder(SYMBOL, QUANTITY, SIDE.BUY)
+            .then(data => operationService.save({...data, strategy: STRATEGY}))
+            .catch(err => errorService.save({...err, strategy: STRATEGY}))
         save(content)
 
     }else if( rsi > 70 && isOpened ){
         console.log('Sobrecomprado, hora de Vender');
         content += `Vender\n\n`
         newOrder(SYMBOL, QUANTITY, SIDE.SELL)
+                .then(data => operationService.save({...data, strategy: STRATEGY}))
+                .catch(err => errorService.save({...err, strategy: STRATEGY}))
         save(content)
         isOpened = false
+        saveEnvVariable('IS_OPENED', isOpened);
     }else{
         console.log('Aguardar');
         

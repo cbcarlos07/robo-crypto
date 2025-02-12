@@ -1,9 +1,9 @@
 const OperationRepository = require("../repository/OperationRepository")
-class OperationService {
+class OperationRSIService {
 
     save(data){
         return OperationRepository.save(data)
     }
 }
 
-module.exports = new OperationService()
+module.exports = new OperationRSIService()

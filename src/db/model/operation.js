@@ -9,6 +9,8 @@ const operationSchema = new mongoose.Schema({
     side: { type: String },
     type: { type: String },
     executedQty: { type: Number },
+    strategy: {type: String},
+    date: {type: String},
     fills: { type: Array, default: [] }
 
 });
