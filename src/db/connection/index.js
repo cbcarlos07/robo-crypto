@@ -8,7 +8,7 @@ mongoose.set('strictQuery', false); // Preparar para a mudança futura
 const connect = () => {
     return mongoose.connect(MONGODB_URI, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
     })
 }
 

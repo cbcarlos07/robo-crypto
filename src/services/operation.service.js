@@ -1,9 +1,10 @@
 const OperationRepository = require("../repository/OperationRepository")
-class OperationRSIService {
+const BaseService = require("./base.service")
+class OperationRSIService extends BaseService{
 
-    save(data){
-        return OperationRepository.save(data)
+    constructor(repository){
+        super(repository)
     }
 }
 
-module.exports = new OperationRSIService()
+module.exports = new OperationRSIService(OperationRepository)

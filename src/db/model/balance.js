@@ -6,8 +6,8 @@ const balanceSchema = new mongoose.Schema({
     quantity: {type: Number},
     buyTotal: {type: Number},
     sellTotal: {type: Number},
-    profit: {type: Number},
-    percentageProfit: {type: Number}
+    profit: { type: Number, index: true },
+    percentageProfit: { type: Number, index: true }
 
 });
 

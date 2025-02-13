@@ -1,10 +1,11 @@
 const ErrorRepository = require("../repository/ErrorRepository")
+const BaseService = require("./base.service")
 
-class ErrorService {
+class ErrorService extends BaseService{
 
-    save(data){
-        return ErrorRepository.save(data)
+    constructor(repository){
+        super(repository)
     }
 }
 
-module.exports = new ErrorService()
+module.exports = new ErrorService(ErrorRepository)

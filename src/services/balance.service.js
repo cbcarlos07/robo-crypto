@@ -1,9 +1,15 @@
 const repository = require("../repository/BalanceRepository")
-class BalanceService {
+const BaseService = require("./base.service")
 
-    save(data){
-        return repository.save(data)
+class BalanceService extends BaseService {
+
+    constructor(repository){
+        super(repository)
+    }
+
+    sum(){
+        return this.repository.sum()
     }
 }
 
-module.exports = new BalanceService()
+module.exports = new BalanceService(repository)
