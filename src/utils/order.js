@@ -119,6 +119,45 @@ const newOrderPrice = async (symbol, price, side, quoteOrderQty) => {
     }
 }
 
-module.exports = newOrder
+const newOrderStrategyPrice = (symbol, quantity, side) => {
+    return new Promise(async(resolve, reject)=>{
 
-module.exports = {newOrderPrice}
+        const data = {
+            symbol,
+            side,
+            quantity,
+            type: 'MARKET',
+            timestamp: Date.now(),
+            recvWindow: 60000
+        }
+    
+        const signature = crypto
+                                .createHmac('sha256', SECRET_KEY)
+                                .update(`${new URLSearchParams(data)}`)
+                                .digest('hex')
+    
+        const newData = {...data, signature}
+ 
+        try {            
+            const result = await axios.post(
+                                    `${API_URL}/api/v3/order`,
+                                    new URLSearchParams(newData).toString(),
+                                    {
+                                        headers: {'X-MBX-APIKEY' : API_KEY}
+                                    }
+            )
+            console.log(result.data);
+            resolve(result.data)
+        } catch (error) {
+            console.error('error',error)
+            reject(error.response.data)
+            
+        }
+    })
+
+}
+
+
+
+
+module.exports = {newOrderPrice, newOrderStrategyPrice, newOrder}

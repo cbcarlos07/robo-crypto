@@ -13,7 +13,7 @@ const newOrder = require('./utils/order')
 connect()
 
 const { IS_OPENED_RSI } = process.env
-
+let lastBuyOrder = null;
 const SYMBOL = 'BTCUSDT'
 const PERIOD = 14
 const QUANTITY = '0.001'
@@ -22,7 +22,7 @@ const API_URL = 'https://testnet.binance.vision' //'https://testnet.binance.visi
 const STRATEGY = 'RSI'
 
 
-let isOpened = false
+let isOpened = IS_OPENED_RSI == 'true'
 
 const averages = (prices, period, startIndex = 1) => {
     let gains = 0
@@ -72,9 +72,8 @@ const RSI = (prices, period) => {
 const start = async () => {
     console.clear()
     console.log('Estratégia RSI');
-    console.log('IS_OPENED',IS_OPENED_RSI);
+    console.log('IS_OPENED_RSI',isOpened);
     
-    isOpened = IS_OPENED_RSI == 'true'
     let content = ''
     const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${SYMBOL}`)
     const candle = data[ data.length - 1 ]
@@ -93,43 +92,60 @@ const start = async () => {
     console.log('Já comprei', isOpened);
     
     
-    newOrder(SYMBOL, QUANTITY, SIDE.SELL).then(data =>{
-        operationService.save({...data, strategy: STRATEGY})
-            .then(data => console.log('data',data))
-            .catch(err => {
-                console.log('err',err)
+    // newOrder.newOrder(SYMBOL, QUANTITY, SIDE.SELL).then(data =>{
+    //     operationService.save({...data, strategy: STRATEGY})
+    //         .then(data => console.log('data',data))
+    //         .catch(err => {
+    //             console.log('err',err)
+    //         })
+        
+    //     setTimeout(() => {
+    //         process.exit(0)    
+    //     }, 3000);
+        
+    // })
+    
+    
+    if( rsi < 30 && !isOpened ){
+        console.log('Sobrevendido, hora de comprar');
+        isOpened = true
+        saveEnvVariable('IS_OPENED_RSI', isOpened);
+        content += `Comprar\n\n`
+        newOrder.newOrder(SYMBOL, QUANTITY, SIDE.BUY)
+            .then(data => {
+                lastBuyOrder = data
+                operationService.save({...data, strategy: STRATEGY})
             })
-        
-        setTimeout(() => {
-            process.exit(0)    
-        }, 3000);
-        
-    })
-    
-    
-    // if( rsi < 30 && !isOpened ){
-    //     console.log('Sobrevendido, hora de comprar');
-    //     isOpened = true
-    //     saveEnvVariable('IS_OPENED', isOpened);
-    //     content += `Comprar\n\n`
-    //     newOrder(SYMBOL, QUANTITY, SIDE.BUY)
-    //         .then(data => operationService.save({...data, strategy: STRATEGY}))
-    //         .catch(err => errorService.save({...err, strategy: STRATEGY}))
-    //     save(content)
+            .catch(err => errorService.save({...err, strategy: STRATEGY}))
+        save(content)
 
-    // }else if( rsi > 70 && isOpened ){
-    //     console.log('Sobrecomprado, hora de Vender');
-    //     content += `Vender\n\n`
-    //     newOrder(SYMBOL, QUANTITY, SIDE.SELL)
-    //             .then(data => operationService.save({...data, strategy: STRATEGY}))
-    //             .catch(err => errorService.save({...err, strategy: STRATEGY}))
-    //     save(content)
-    //     isOpened = false
-    //     saveEnvVariable('IS_OPENED', isOpened);
-    // }else{
-    //     console.log('Aguardar');
+    }else if( rsi > 70 && isOpened ){
+        console.log('Sobrecomprado, hora de Vender');
+        content += `Vender\n\n`
+        newOrder.newOrder(SYMBOL, QUANTITY, SIDE.SELL)
+                .then(data => {
+                    if( lastBuyOrder ){
+                        const profitResult = calculateProfit(lastBuyOrder, data);
+                        console.log('Venda');
+                        console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
+                        console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
+                        console.log('quntidade',`$${profitResult.quantity}`)
+                        console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
+                        console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
+                        balanceService.save(profitResult)
+                        
+                        lastBuyOrder = null
+                    }
+                    operationService.save({...data, strategy: STRATEGY})
+                })
+                .catch(err => errorService.save({...err, strategy: STRATEGY}))
+        save(content)
+        isOpened = false
+        saveEnvVariable('IS_OPENED_RSI', isOpened);
+    }else{
+        console.log('Aguardar');
         
-    // }
+    }
     
 }
 
