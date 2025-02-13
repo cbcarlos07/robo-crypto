@@ -1,0 +1,84 @@
+{
+  "symbol": "BTCUSDT",
+  "orderId": 4005168,
+  "orderListId": -1,
+  "clientOrderId": "eVcZjeBhDPB0T8rAaWEqIj",
+  "transactTime": 1739405230511,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "97.68715000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1739405230511,
+  "fills": [
+    {
+      "price": "97687.15000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 727873
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 4005180,
+  "orderListId": -1,
+  "clientOrderId": "9ZFFe1sYtO75f3vJZFaPXX",
+  "transactTime": 1739405233297,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "97.68715000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1739405233297,
+  "fills": [
+    {
+      "price": "97687.15000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 727874
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 4005346,
+  "orderListId": -1,
+  "clientOrderId": "xH2hCzo31nzzaVpDfuLW2r",
+  "transactTime": 1739405270179,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "97.63692000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1739405270179,
+  "fills": [
+    {
+      "price": "97636.92000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 727910
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER"
+}
+

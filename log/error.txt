@@ -1,0 +1,30 @@
+Data: 12/02/2025 20:54:06
+{
+  "code": -1013,
+  "msg": "Filter failure: MARKET_LOT_SIZE"
+}
+
+Data: 12/02/2025 21:01:35
+{
+  "code": -1013,
+  "msg": "Filter failure: MARKET_LOT_SIZE"
+}
+
+Data: 12/02/2025 21:01:36
+{
+  "code": -1013,
+  "msg": "Filter failure: MARKET_LOT_SIZE"
+}
+
+Data: 12/02/2025 21:02:39
+{
+  "code": -1013,
+  "msg": "Filter failure: MARKET_LOT_SIZE"
+}
+
+Data: 12/02/2025 21:03:36
+{
+  "code": -1013,
+  "msg": "Filter failure: MARKET_LOT_SIZE"
+}
+
