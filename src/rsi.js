@@ -9,6 +9,9 @@ const operationService = require('./services/operation.service')
 const connect = require('./db/connection')
 const errorService = require('./services/error.service')
 const newOrder = require('./utils/order')
+const sendMessage = require('./utils/telegram')
+const calculateProfit = require('./utils/calculateProfit')
+const prepareMsg = require('./utils/prepareMsg')
 
 const { IS_OPENED_RSI } = process.env
 let lastBuyOrder = null;
@@ -93,16 +96,21 @@ const start = () => {
         
         
         // newOrder.newOrder(SYMBOL, QUANTITY, SIDE.SELL).then(data =>{
-            //     operationService.save({...data, strategy: STRATEGY})
-        //         .then(data => console.log('data',data))
-        //         .catch(err => {
-            //             console.log('err',err)
-        //         })
-        
-        //     setTimeout(() => {
-            //         process.exit(0)    
-        //     }, 3000);
-        
+        //             const profitResult = calculateProfit(data, data);
+        //             const content = prepareMsg(profitResult)
+        //             sendMessage( content )
+        //             setTimeout(() => {
+        //                 process.exit(0)    
+        //             }, 2000);
+                    
+        //             operationService.save({...data, strategy: STRATEGY})
+        //             .then(data => {
+        //                 console.log('data',data)
+                        
+        //             })
+        //             .catch(err => {
+        //                     console.log('err',err)
+        //             })
         // })
         
         
@@ -113,9 +121,9 @@ const start = () => {
             content += `Comprar\n\n`
             save(content)
             newOrder.newOrder(SYMBOL, QUANTITY, SIDE.BUY)
-                .then(data => {
+                .then(async data => {
                     lastBuyOrder = data
-                    operationService.save({...data, strategy: STRATEGY})
+                    await operationService.save({...data, strategy: STRATEGY}) 
                     resolve({})
                 })
                 .catch(err => {
@@ -134,6 +142,8 @@ const start = () => {
             .then(async data => {
                 if( lastBuyOrder ){
                     const profitResult = calculateProfit(lastBuyOrder, data);
+                    const _content = prepareMsg(profitResult)
+                    sendMessage( _content )
                     console.log('Venda');
                     console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
                     console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
@@ -161,6 +171,7 @@ const start = () => {
     })
     
 }
+
 
 
 //setInterval(start,3000)

@@ -11,6 +11,8 @@ const errorService = require('./services/error.service')
 const { format } = require('date-fns')
 const calculateProfit = require('./utils/calculateProfit')
 const balanceService = require('./services/balance.service')
+const prepareMsg = require('./utils/prepareMsg')
+const sendMessage = require('./utils/telegram')
 
 const SYMBOL = 'BTCUSDT'
 const BUY_PRICE = 97142
@@ -114,6 +116,8 @@ const start = () => {
                 .then(async data => {
                     if( lastBuyOrder ){
                         const profitResult = calculateProfit(lastBuyOrder, data);
+                        const content = prepareMsg(profitResult)
+                        sendMessage(content)
                         console.log('Venda');
                         console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
                         console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
