@@ -9,7 +9,8 @@ const bot = new TelegramBot(token, { polling: true });
 const chatId = TELEGRAM_CHATID;
 
 const sendMessage = (message) => {
-    bot.sendMessage(chatId, message)
+    const parseMode = 'Markdown'
+    bot.sendMessage(chatId, message, { parse_mode: parseMode })
         .then(() => {
             console.log(`Mensagem enviada: ${message}`);
         })
