@@ -1,19 +1,15 @@
 const mongoose = require('mongoose');
-const { MONGO_USER, MONGO_PWD } = process.env
-const MONGODB_URI = `mongodb+srv://${MONGO_USER}:${MONGO_PWD}@cluster0.jwaei.mongodb.net/bot-crypto?retryWrites=true&w=majority&appName=Cluster0`
+const { MONGO_USER, MONGO_PWD, MONGO_DB } = process.env
+const MONGODB_URI = `mongodb+srv://${MONGO_USER}:${MONGO_PWD}@cluster0.jwaei.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority&appName=Cluster0`
+
+mongoose.set('strictQuery', false); // Preparar para a mudança futura
 
 // Conectar ao MongoDB
 const connect = () => {
-    mongoose.connect(MONGODB_URI, {
+    return mongoose.connect(MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
-    .then(() => {
-        console.log('Conectado ao MongoDB!');
-    })
-    .catch(err => {
-        console.error('Erro ao conectar ao MongoDB:', err);
-    });
 }
 
 module.exports = connect

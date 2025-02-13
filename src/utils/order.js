@@ -30,8 +30,9 @@ const newOrder = (symbol, quantity, side) => {
                                         }
                                     )
             console.log(data);
-            save( `${JSON.stringify( data,null, 2 )}\n\n` )
-            resolve(data)
+            const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
+            save( `${JSON.stringify( {...data, date},null, 2 )}\n\n` )
+            resolve({...data, date})
         } catch (error) {
             const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
             console.log('deu erro', date);
@@ -39,7 +40,7 @@ const newOrder = (symbol, quantity, side) => {
             console.log('deu erro', error.response.data);
             let content = `Data: ${date}\n`
             content += `${JSON.stringify( error.response.data, null, 2 )}\n\n`
-            errorFn(content)
+            errorFn({...content, date})
             reject( error.response.data )
         }
         
