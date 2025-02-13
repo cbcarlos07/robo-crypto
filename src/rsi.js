@@ -13,13 +13,13 @@ const sendMessage = require('./utils/telegram')
 const calculateProfit = require('./utils/calculateProfit')
 const prepareMsg = require('./utils/prepareMsg')
 
-const { IS_OPENED_RSI } = process.env
+const { IS_OPENED_RSI, API_URL } = process.env
 let lastBuyOrder = null;
 const SYMBOL = 'BTCUSDT'
 const PERIOD = 14
 const QUANTITY = '0.001'
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
-const API_URL = 'https://testnet.binance.vision' //'https://testnet.binance.vision'; //https://api.binance.com
+ //'https://testnet.binance.vision'; //https://api.binance.com
 const STRATEGY = 'RSI'
 
 

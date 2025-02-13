@@ -20,8 +20,8 @@ const SELL_PRICE = 98003
 const QUANTITY = '0.001'
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
 const STRATEGY = 'PRICE'
-const { IS_OPENED_PRICE } = process.env
-const API_URL = 'https://testnet.binance.vision'; //https://api.binance.com
+const { IS_OPENED_PRICE, API_URL } = process.env
+//const API_URL = 'https://testnet.binance.vision'; //https://api.binance.com
 
 let isOpened = IS_OPENED_PRICE == 'true'
 let lastBuyOrder = null;
