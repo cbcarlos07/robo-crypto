@@ -11,7 +11,11 @@ const operationSchema = new mongoose.Schema({
     executedQty: { type: Number },
     strategy: {type: String},
     date: {type: String},
-    fills: { type: Array, default: [] }
+    fills: { type: Array, default: [] },
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
 
 });
 

@@ -1,18 +1,18 @@
 
-require('dotenv').config()
+
 const axios = require('axios')
 const { CronJob } = require('cron')
-
-const connect = require('./db/connection')
-const operationService = require('./services/operation.service')
-const { saveEnvVariable } = require('./file')
-const newOrder = require('./utils/order')
-const errorService = require('./services/error.service')
 const { format } = require('date-fns')
-const calculateProfit = require('./utils/calculateProfit')
-const balanceService = require('./services/balance.service')
-const prepareMsg = require('./utils/prepareMsg')
-const sendMessage = require('./utils/telegram')
+
+const connect = require('../config/db/connection')
+const operationService = require('../core/services/operation.service')
+const { saveEnvVariable } = require('../utils/file')
+const newOrder = require('../utils/order')
+const errorService = require('../core/services/error.service')
+const calculateProfit = require('../utils/calculateProfit')
+const balanceService = require('../core/services/balance.service')
+const prepareMsg = require('../utils/prepareMsg')
+const telegram = require('../utils/telegram')
 
 const SYMBOL = 'BTCUSDT'
 const BUY_PRICE = 97142
@@ -117,7 +117,7 @@ const start = () => {
                     if( lastBuyOrder ){
                         const profitResult = calculateProfit(lastBuyOrder, data);
                         const content = prepareMsg(profitResult)
-                        sendMessage(content)
+                        telegram.sendMessage(content)
                         console.log('Venda');
                         console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
                         console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
@@ -184,6 +184,4 @@ const startPrice = async () => {
 }
 
 
-
-startPrice()
 module.exports = startPrice

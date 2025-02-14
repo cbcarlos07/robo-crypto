@@ -1,18 +1,17 @@
-require('dotenv').config()
+
 const axios = require('axios')
 const {format} = require('date-fns')
-
 const { CronJob } = require('cron')
 
-const {save} = require('./file')
-const operationService = require('./services/operation.service')
-const connect = require('./db/connection')
-const errorService = require('./services/error.service')
-const newOrder = require('./utils/order')
-const sendMessage = require('./utils/telegram')
-const calculateProfit = require('./utils/calculateProfit')
-const prepareMsg = require('./utils/prepareMsg')
-const balanceService = require('./services/balance.service')
+const {save} = require('../utils/file')
+const operationService = require('../core/services/operation.service')
+const connect = require('../config/db/connection')
+const errorService = require('../core/services/error.service')
+const newOrder = require('../utils/order')
+const telegram = require('../utils/telegram')
+const calculateProfit = require('../utils/calculateProfit')
+const prepareMsg = require('../utils/prepareMsg')
+const balanceService = require('../core/services/balance.service')
 
 const { IS_OPENED_RSI, API_URL } = process.env
 let lastBuyOrder = null;
@@ -96,11 +95,11 @@ const start = () => {
         console.log('Já comprei', isOpened);
         
         
-        // newOrder.newOrder(SYMBOL, QUANTITY, SIDE.SELL).then(data =>{
+        // newOrder.newOrder(SYMBOL, QUANTITY, SIDE.BUY).then(data =>{
         //             const profitResult = calculateProfit(data, data);
         //             const content = prepareMsg(profitResult)
         //             balanceService.save(profitResult)
-        //             sendMessage( content )
+        //             telegram.sendMessage( content )
         //             setTimeout(() => {
         //                 process.exit(0)    
         //             }, 2000);
@@ -143,7 +142,7 @@ const start = () => {
                 if( lastBuyOrder ){
                     const profitResult = calculateProfit(lastBuyOrder, data);
                     const _content = prepareMsg(profitResult)
-                    sendMessage( _content )
+                    telegram.sendMessage( _content )
                     console.log('Venda');
                     console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
                     console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
@@ -212,5 +211,5 @@ const startRSI = () => {
     })
 }
 
-startRSI()
+
 module.exports = startRSI

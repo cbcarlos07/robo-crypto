@@ -1,6 +1,6 @@
-require('dotenv').config()
+
 const TelegramBot = require('node-telegram-bot-api');
-const balanceService = require('../services/balance.service');
+const balanceService = require('../core/services/balance.service');
 const { TELEGRAM_TOKEN, TELEGRAM_CHATID } = process.env
 // Substitua 'SEU_TOKEN' pelo token do seu bot
 const token = TELEGRAM_TOKEN;
@@ -24,8 +24,6 @@ bot.on('message', msg => {
     if( msg.text === '/saldo' ){
         console.log('saldo');
         getBalance()
-        
-        
     }
 })
 
@@ -48,4 +46,5 @@ const getBalance = () => {
 
 // Exemplo de uso
 //sendMessage('Olá! Esta é uma mensagem de teste do seu aplicativo Node.js.');
-module.exports = sendMessage
+
+module.exports = {sendMessage, getBalance}

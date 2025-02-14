@@ -1,9 +1,8 @@
 require('dotenv').config()
+const server = require('./server')
 
-const startPrice = require('./price')
-const startRSI = require('./rsi')
+const SERVER_PORT = process.env.SERVER_PORT
 
-startPrice()
-console.log('------');
-
-startRSI()
+server.listen(SERVER_PORT, () => {
+    console.log(`API is running on [port ${SERVER_PORT}]`);
+  });

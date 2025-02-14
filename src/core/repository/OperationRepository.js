@@ -1,4 +1,4 @@
-const operation = require("../db/model/operation");
+const operation = require("../../config/db/model/operation");
 const Repository = require("./Repository");
 
 class OperationRSIRepository extends Repository{

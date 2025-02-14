@@ -4,7 +4,10 @@ const errorSchema = new mongoose.Schema({
     code: { type: Number },
     msg: { type: String },
     date: { type: String },
-    // Adicione outros campos conforme necessário
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
 });
 
 // Criar o modelo

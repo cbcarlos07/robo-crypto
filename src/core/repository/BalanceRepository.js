@@ -1,4 +1,4 @@
-const model = require("../db/model/balance");
+const model = require("../../config/db/model/balance");
 const Repository = require("./Repository");
 
 class BalanceRSIRepository extends Repository{

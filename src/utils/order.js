@@ -1,8 +1,9 @@
 
 const crypto = require('crypto')
-const { save, errorFn } = require('../file')
 const { format } = require('date-fns')
 const { default: axios } = require('axios')
+
+const { save, errorFn } = require('../utils/file')
 
 const { API_KEY, SECRET_KEY, API_URL } = process.env
 //const API_URL = 'https://testnet.binance.vision' //'https://testnet.binance.vision'; //https://api.binance.com

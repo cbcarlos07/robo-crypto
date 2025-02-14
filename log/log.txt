@@ -295,3 +295,32 @@
   "date": "13/02/2025 16:13:30"
 }
 
+{
+  "symbol": "BTCUSDT",
+  "orderId": 4801858,
+  "orderListId": -1,
+  "clientOrderId": "TaIHnMnaJ1mlgs6Uq341Vo",
+  "transactTime": 1739564850543,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "97.98017000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "BUY",
+  "workingTime": 1739564850543,
+  "fills": [
+    {
+      "price": "97980.17000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "BTC",
+      "tradeId": 921037
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "14/02/2025 17:27:30"
+}
+

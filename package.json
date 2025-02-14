@@ -1,26 +1,36 @@
 {
   "name": "bot-crypto",
   "version": "1.0.0",
-  "description": "",
+  "description": "Robô para trader automatizado",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src"
+    "dev": "nodemon src",
+    "rsi": "nodemon src/index-job rsi",
+    "price": "nodemon src/index-job price",
+    "balance": "nodemon src/index-job balance"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.9",
+    "cors": "^2.8.5",
     "cron": "^3.5.0",
     "date-fns": "^2.0.0",
     "dotenv": "^16.4.7",
+    "express": "^4.21.0",
+    "helmet": "^4.6.0",
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.13.0",
     "mongoose": "^6.13.8",
     "node-telegram-bot-api": "^0.24.0",
     "nodemon": "^3.1.9",
     "path": "^0.12.7",
     "request": "^2.88.2",
-    "request-promise": "^4.2.6"
+    "request-promise": "^4.2.6",
+    "require-dir": "^1.2.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

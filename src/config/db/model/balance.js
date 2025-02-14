@@ -7,8 +7,11 @@ const balanceSchema = new mongoose.Schema({
     buyTotal: {type: Number},
     sellTotal: {type: Number},
     profit: { type: Number, index: true },
-    percentageProfit: { type: Number, index: true }
-
+    percentageProfit: { type: Number, index: true },
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'  // Nome do modelo referenciado 
+    }
 });
 
 // Criar o modelo
