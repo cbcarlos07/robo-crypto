@@ -162,6 +162,7 @@ const startPrice = async () => {
         console.log('Conectado ao MongoDB!');
         UserService.getApproved()
             .then(resp => {
+                telegram.setSetChatId( resp[0].chatId )
                 console.log('resp',resp);
                 
                 const job = new CronJob(

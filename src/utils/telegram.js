@@ -7,7 +7,9 @@ const token = TELEGRAM_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
 // Substitua 'SEU_CHAT_ID' pelo ID do chat onde você quer enviar a mensagem
-const chatId = TELEGRAM_CHATID;
+let chatId = TELEGRAM_CHATID;
+
+const setSetChatId = id => chatId = id
 
 const sendMessage = (message) => {
     const parseMode = 'Markdown'
@@ -47,4 +49,4 @@ const getBalance = () => {
 // Exemplo de uso
 //sendMessage('Olá! Esta é uma mensagem de teste do seu aplicativo Node.js.');
 
-module.exports = {sendMessage, getBalance}
+module.exports = {sendMessage, getBalance, setSetChatId}
