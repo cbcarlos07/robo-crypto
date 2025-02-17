@@ -1,8 +1,11 @@
 const { StatusCodes } = require("http-status-codes")
+const messages = require("./messages")
+
 class BaseController {
     constructor(service){
         this.service = service
         this.StatusCodes = StatusCodes
+        this.messages = messages
     }
 
     save(req,res,next){
@@ -40,6 +43,17 @@ class BaseController {
         this.service.find(req.body)
                     .then(resp => {
                         res.status(this.StatusCodes.OK).json(resp)
+                    })
+                    .catch(err => {
+                        next({...err, message: err.message, status: 500})
+                    })
+    }
+    
+    delete(req,res,next){
+        const {id} = req.params
+        this.service.delete({id})
+                    .then(() => {
+                        res.status(this.StatusCodes.OK).json(this.messages.removed)
                     })
                     .catch(err => {
                         next({...err, message: err.message, status: 500})

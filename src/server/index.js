@@ -65,7 +65,7 @@ const exclusions = [
     '/auth-panel',
     '/refresh-token'
   ]
-app.use(jwt({exclusions}))
+//app.use(jwt({exclusions}))
 fnRouterConfig({app})
 
 //realtime(io)

@@ -29,6 +29,10 @@ class Repository {
     find(data){
         return this.model.find(data);
     }
+
+    delete(data){
+        return this.model.deleteOne(data)
+    }
 }
 
 module.exports = Repository

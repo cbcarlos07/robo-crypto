@@ -19,6 +19,10 @@ class BaseService{
     find(data){
         return this.repository.find(data);
     }
+
+    delete(data){
+        return this.repository.delete(data)
+    }
 }
 
 module.exports = BaseService
