@@ -14,6 +14,7 @@ const balanceService = require('../core/services/balance.service')
 const prepareMsg = require('../utils/prepareMsg')
 const telegram = require('../utils/telegram')
 const UserService = require('../core/services/user.service')
+const strategyService = require('../core/services/strategy.service')
 
 const SYMBOL = 'BTCUSDT'
 const BUY_PRICE = 97142
@@ -26,7 +27,7 @@ const { IS_OPENED_PRICE, API_URL } = process.env
 
 let isOpened = IS_OPENED_PRICE == 'true'
 let lastBuyOrder = null;
-const start = () => {
+const start = user => {
     return new Promise(async(resolve,reject)=> {
 
         console.clear()
@@ -161,14 +162,16 @@ const startPrice = async () => {
     .then(() => {
         console.log('Conectado ao MongoDB!');
         UserService.getApproved()
-            .then(resp => {
+            .then(async resp => {
                 telegram.setSetChatId( resp[0].chatId )
                 console.log('resp',resp);
+                const strategy = await strategyService.find({userId: resp[0].id})
+                console.log('strategy',strategy);
                 
                 const job = new CronJob(
                     '*/3 * * * * *',
                     async () => {
-                        start()
+                        start(resp[0])
                           .then(()=>console.log('Operaçao realizada'))
                           .catch(()=> {
                             console.log('Falha');
