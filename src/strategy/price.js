@@ -13,6 +13,7 @@ const calculateProfit = require('../utils/calculateProfit')
 const balanceService = require('../core/services/balance.service')
 const prepareMsg = require('../utils/prepareMsg')
 const telegram = require('../utils/telegram')
+const UserService = require('../core/services/user.service')
 
 const SYMBOL = 'BTCUSDT'
 const BUY_PRICE = 97142
@@ -96,6 +97,13 @@ const start = () => {
                     console.log('Preço',_price);
                     console.log('Qtde',qtd);
                     console.log('Total',total);
+                    const conteMsg = `
+            Compra
+            Preço: $${_price}
+            Quantidade: $${qtd}
+            Total: ${total}
+            `
+                    telegram.sendMessage( conteMsg )
                     operationService.save({...data, strategy: STRATEGY})
                         .then(d => {
                             console.log('salvou operacao', d)
@@ -152,24 +160,30 @@ const startPrice = async () => {
     connect()
     .then(() => {
         console.log('Conectado ao MongoDB!');
-        const job = new CronJob(
-            '*/3 * * * * *',
-            async () => {
-                start()
-                  .then(()=>console.log('Operaçao realizada'))
-                  .catch(()=> {
-                    console.log('Falha');
-                    job.stop()
-                    setTimeout(() => {
-                        startPrice()
-                    }, 5000);
-                  })
-            },
-            null, // onComplete
-            true, // start
-            'America/Sao_Paulo' // ajuste para seu fuso horário
+        UserService.getApproved()
+            .then(resp => {
+                console.log('resp',resp);
+                
+                const job = new CronJob(
+                    '*/3 * * * * *',
+                    async () => {
+                        start()
+                          .then(()=>console.log('Operaçao realizada'))
+                          .catch(()=> {
+                            console.log('Falha');
+                            job.stop()
+                            setTimeout(() => {
+                                startPrice()
+                            }, 5000);
+                          })
+                    },
+                    null, // onComplete
+                    true, // start
+                    'America/Sao_Paulo' // ajuste para seu fuso horário
+                
+                )
+            })
         
-        )
       }).catch(e => {
 
           console.error('Erro ao conectar ao MongoDB:', e.message);

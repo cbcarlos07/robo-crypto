@@ -8,8 +8,12 @@ const fnRouterConfig = require('../api/routes/router.config')
 
 const jwt = require('../api/middlewares/jwt.middlware')
 //const realtime = require('./config/realtime');
-const ErrorsHandler = require('../config/Errors')
+const ErrorsHandler = require('../config/Errors');
+const connect = require('../config/db/connection');
+
 const server = require('http').createServer(app); 
+
+connect()
 
 // const io = socketIO(server, {
 //     cors: {

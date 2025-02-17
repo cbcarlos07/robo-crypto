@@ -19,6 +19,7 @@ class BaseController {
     }
 
     update(req,res,next){
+        const {id} = req.params
         return this.service.update(id, req.body)
         .then(() => {
              res.status(this.StatusCodes.OK).json({msg: this.messages.updated})
@@ -50,8 +51,8 @@ class BaseController {
     }
     
     delete(req,res,next){
-        const {id} = req.params
-        this.service.delete({id})
+        const {id: _id} = req.params
+        this.service.delete({_id})
                     .then(() => {
                         res.status(this.StatusCodes.OK).json(this.messages.removed)
                     })
