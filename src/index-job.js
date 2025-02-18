@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const startPrice = require('./strategy/price')
+const {startPrice} = require('./strategy/price')
 const startRSI = require('./strategy/rsi')
 const { getBalance } = require('./utils/telegram')
 

@@ -19,6 +19,10 @@ class BaseService{
     find(data){
         return this.repository.find(data);
     }
+    
+    findOne(data){
+        return this.repository.findOne(data);
+    }
 
     delete(data){
         return this.repository.delete(data)

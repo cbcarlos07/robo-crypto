@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const strategySchema = new mongoose.Schema({    
     strategy: {type: String},
     isOpened: {type: Boolean},
+    symbol: {type: String},
+    buyPrice: {type: Number},
+    sellPrice: {type: Number},
+    quantity: {type: String},
+    period: {type: Number},
     userId: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'  // Nome do modelo referenciado 

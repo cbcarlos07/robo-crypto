@@ -62,14 +62,9 @@ app.use(express.static('public'))
 const exclusions = [
     '/',
     '/auth',
-    '/socket.io',
-    '/token',
-    '/image',
-    '/register',
-    '/auth-panel',
-    '/refresh-token'
+    '/create',
   ]
-//app.use(jwt({exclusions}))
+app.use(jwt({exclusions}))
 fnRouterConfig({app})
 
 //realtime(io)

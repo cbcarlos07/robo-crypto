@@ -30,6 +30,10 @@ class Repository {
         return this.model.find(data);
     }
     
+    findOne(data){
+        return this.model.findOne(data);
+    }
+    
     delete(data){
         return this.model.deleteOne(data)
     }

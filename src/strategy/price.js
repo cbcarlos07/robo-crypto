@@ -1,7 +1,6 @@
 
-
-const axios = require('axios')
 const { CronJob } = require('cron')
+const axios = require('axios')
 const { format } = require('date-fns')
 
 const connect = require('../config/db/connection')
@@ -27,12 +26,18 @@ const { IS_OPENED_PRICE, API_URL } = process.env
 
 let isOpened = IS_OPENED_PRICE == 'true'
 let lastBuyOrder = null;
-const start = user => {
+
+const start = strategy => {
     return new Promise(async(resolve,reject)=> {
 
         console.clear()
+        const symbol = strategy.symbol
+        const buyPrice = strategy.buyPrice
+        const sellPrice = strategy.sellPrice
+        const quantity = strategy.quantity
+        
         console.log('Estratégia PRECO');
-        const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${SYMBOL}`)
+        const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
         //console.log('data',data);
         
         const candle = data[ data.length - 1 ]
@@ -40,56 +45,57 @@ const start = user => {
         console.log("Data", format(new Date, 'dd/MM/yyyy HH:mm:ss'));
         console.log("Price", price);
         console.log('ja comprei', isOpened);
-        console.log('BUY_PRICE', BUY_PRICE);
-        console.log('SELL_PRICE', SELL_PRICE);
+        console.log('BUY_PRICE', buyPrice);
+        console.log('SELL_PRICE', sellPrice);
         
-        // const valueBuy = await newOrder.newOrder(SYMBOL, QUANTITY, SIDE.BUY)
+        const valueBuy = await newOrder.newOrder(symbol, quantity, SIDE.BUY)
     
-        // lastBuyOrder = valueBuy
-        // const _price = valueBuy.fills[0].price
-        // const qtd = valueBuy.executedQty
-        // const total = parseFloat(_price * qtd).toFixed(2)
-        // console.log('Compra');
-        // console.log('Preço',_price);
-        // console.log('Qtde',qtd);
-        // console.log('Total',total);
-        // const save1 = await operationService.save({...valueBuy, strategy: STRATEGY})
-        // console.log('save1',save1);
+        lastBuyOrder = valueBuy
+        const _price = valueBuy.fills[0].price
+        const qtd = valueBuy.executedQty
+        const total = parseFloat(_price * qtd).toFixed(2)
+        console.log('Compra');
+        console.log('Preço',_price);
+        console.log('Qtde',qtd);
+        console.log('Total',total);
+        const save1 = await operationService.save({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
+        console.log('save1',save1);
         
-        // console.log('lastBuyOrder',lastBuyOrder);
+        console.log('lastBuyOrder',lastBuyOrder);
         
                 
-        // const valueSell = await newOrder.newOrder(SYMBOL, QUANTITY, SIDE.SELL)
-        // if( lastBuyOrder ){
-        //     const profitResult = calculateProfit(lastBuyOrder, valueSell);
-        //     console.log('Venda');
-        //     console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
-        //     console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
-        //     console.log('quntidade',`$${profitResult.quantity}`)
-        //     console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
-        //     console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
-        //     balanceService.save(profitResult)
+        const valueSell = await newOrder.newOrder(symbol, quantity, SIDE.SELL)
+        if( lastBuyOrder ){
+            const profitResult = calculateProfit(lastBuyOrder, valueSell);
+            console.log('Venda');
+            console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
+            console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
+            console.log('quntidade',`$${profitResult.quantity}`)
+            console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
+            console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
+            balanceService.save({...profitResult,userId: strategy.userId })
             
-        //     lastBuyOrder = null
+            lastBuyOrder = null
             
     
-        // }
+        }
                     
-        // await operationService.save({...valueSell, strategy: STRATEGY})
+        await operationService.save({...valueSell, userId: strategy.userId, strategy: STRATEGY})
         
-        // setTimeout(() => {
-        //     process.exit(0)
-        // }, 2000);
+        setTimeout(() => {
+            process.exit(0)
+        }, 2000);
                 
     
-                
+         /*       
         
-        if( price <= BUY_PRICE && !isOpened ){
+        if( price <= buyPrice && !isOpened ){
             console.warn('Comprar');
             isOpened = true
+            strategyService.update(strategy.id, {isOpened}).then(resp => console.log('strategy', resp))
             saveEnvVariable('IS_OPENED_PRICE', isOpened);
-            newOrder.newOrder(SYMBOL, QUANTITY, SIDE.BUY)
-                .then(data => {
+            newOrder.newOrder(symbol, quantity, SIDE.BUY, strategy.userId)
+                .then(valueBuy => {
                     lastBuyOrder = valueBuy
                     const _price = valueBuy.fills[0].price
                     const qtd = valueBuy.executedQty
@@ -105,7 +111,7 @@ const start = user => {
             Total: ${total}
             `
                     telegram.sendMessage( conteMsg )
-                    operationService.save({...data, strategy: STRATEGY})
+                    operationService.save({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
                         .then(d => {
                             console.log('salvou operacao', d)
                             resolve({})
@@ -113,15 +119,16 @@ const start = user => {
                 })
                 .catch(err => {
                     errorService.save({...err, strategy: STRATEGY})
-                    reject({})
+                    reject(err)
                 })
     
             //await operationService.save( {...obj, side: SIDE.BUY} )
-        }else if( price >= SELL_PRICE && isOpened ){
+        }else if( price >= sellPrice && isOpened ){
             console.log('Vender');
             isOpened = false
             saveEnvVariable('IS_OPENED_PRICE', isOpened);
-            newOrder.newOrderStrategyPrice(SYMBOL, QUANTITY, SIDE.SELL)
+            strategyService.update(strategy.id, {isOpened})
+            newOrder.newOrderStrategyPrice(symbol, quantity, SIDE.SELL)
                 .then(async data => {
                     if( lastBuyOrder ){
                         const profitResult = calculateProfit(lastBuyOrder, data);
@@ -133,7 +140,7 @@ const start = user => {
                         console.log('quntidade',`$${profitResult.quantity}`)
                         console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
                         console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
-                        balanceService.save(profitResult)
+                        balanceService.save({...profitResult, userId: strategy.userId})
                         
                         lastBuyOrder = null
                     }    
@@ -141,18 +148,19 @@ const start = user => {
                     resolve({})
                 })
                 .catch(err => {
-                    errorService.save({...err, strategy: STRATEGY})
-                    reject({})
+                    errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
+                    reject(err)
                 })
         }else{
             console.log('Aguardar');
             resolve({})
             
-        }
+        }*/
     })
     
     
 }
+
 
 
 //setInterval(start,3000)
@@ -164,28 +172,33 @@ const startPrice = async () => {
         UserService.getApproved()
             .then(async resp => {
                 telegram.setSetChatId( resp[0].chatId )
-                console.log('resp',resp);
-                const strategy = await strategyService.find({userId: resp[0].id})
-                console.log('strategy',strategy);
                 
-                const job = new CronJob(
-                    '*/3 * * * * *',
-                    async () => {
-                        start(resp[0])
-                          .then(()=>console.log('Operaçao realizada'))
-                          .catch(()=> {
-                            console.log('Falha');
-                            job.stop()
-                            setTimeout(() => {
-                                startPrice()
-                            }, 5000);
-                          })
-                    },
-                    null, // onComplete
-                    true, // start
-                    'America/Sao_Paulo' // ajuste para seu fuso horário
+                const strategy = await strategyService.find({userId: resp[0]._id, strategy: 'PRICE'})
                 
-                )
+                strategy.forEach(element => {
+                    isOpened = element.isOpened
+                    const job = new CronJob(
+                        '*/3 * * * * *',
+                        async () => {
+                            
+                            
+                            start(element)
+                              .then(()=>console.log('Operaçao realizada'))
+                              .catch(e=> {
+                                console.log('Falha',e.message);
+                                job.stop()
+                                setTimeout(() => {
+                                    startPrice()
+                                }, 5000);
+                              })
+                        },
+                        null, // onComplete
+                        true, // start
+                        'America/Sao_Paulo' // ajuste para seu fuso horário
+                    
+                    )
+                });
+                
             })
         
       }).catch(e => {
@@ -202,4 +215,4 @@ const startPrice = async () => {
 }
 
 
-module.exports = startPrice
+module.exports = {startPrice, start}

@@ -28,4 +28,4 @@ Data: 12/02/2025 21:03:36
   "msg": "Filter failure: MARKET_LOT_SIZE"
 }
 
-[object Object]
+[object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object][object Object]

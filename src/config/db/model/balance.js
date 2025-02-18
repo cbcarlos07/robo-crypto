@@ -12,7 +12,7 @@ const balanceSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'  // Nome do modelo referenciado 
     }
-});
+}, { timestamps: true });
 
 // Criar o modelo
 module.exports = mongoose.model('Balance', balanceSchema);

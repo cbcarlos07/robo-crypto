@@ -17,7 +17,7 @@ const operationSchema = new mongoose.Schema({
         ref: 'User'
     }
 
-});
+}, { timestamps: true });
 
 // Criar o modelo
 module.exports = mongoose.model('Operation', operationSchema);

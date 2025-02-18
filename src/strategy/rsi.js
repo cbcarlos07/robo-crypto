@@ -12,7 +12,8 @@ const telegram = require('../utils/telegram')
 const calculateProfit = require('../utils/calculateProfit')
 const prepareMsg = require('../utils/prepareMsg')
 const balanceService = require('../core/services/balance.service')
-
+const UserService = require('../core/services/user.service')
+const strategyService = require('../core/services/strategy.service')
 const { IS_OPENED_RSI, API_URL } = process.env
 let lastBuyOrder = null;
 const SYMBOL = 'BTCUSDT'
@@ -70,15 +71,22 @@ const RSI = (prices, period) => {
 
 
 
-const start = () => {
+const start = strategy => {
     return new Promise(async(resolve, reject)=>{
+        const symbol = strategy.symbol
+        const buyPrice = strategy.buyPrice
+        const sellPrice = strategy.sellPrice
+        const quantity = strategy.quantity
+        const period = strategy.period
+        
+
 
         console.clear()
         console.log('Estratégia RSI');
         console.log('IS_OPENED_RSI',isOpened);
         
         let content = ''
-        const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${SYMBOL}`)
+        const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
         const candle = data[ data.length - 1 ]
         const lastPrice = parseFloat( candle[4] ) 
         const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
@@ -89,46 +97,48 @@ const start = () => {
         
         const prices = data.map(k => parseFloat( k[ 4 ] ))
         
-        const rsi = RSI(prices, PERIOD)
+        const rsi = RSI(prices, period)
         console.log('RSI', rsi);
         content += `RSI: ${rsi}\n`
         console.log('Já comprei', isOpened);
         
         
-        // newOrder.newOrder(SYMBOL, QUANTITY, SIDE.BUY).then(data =>{
-        //             const profitResult = calculateProfit(data, data);
-        //             const content = prepareMsg(profitResult)
-        //             balanceService.save(profitResult)
-        //             telegram.sendMessage( content )
-        //             setTimeout(() => {
-        //                 process.exit(0)    
-        //             }, 2000);
+        newOrder.newOrder(symbol, quantity, SIDE.SELL).then(data =>{
+                    const profitResult = calculateProfit(data, data);
+                    const content = prepareMsg(profitResult)
+                    balanceService.save({...profitResult, userId: strategy.userId})
+                    strategyService.update(strategy.id, {isOpened: true})
+                    telegram.sendMessage( content )
+                    setTimeout(() => {
+                        process.exit(0)    
+                    }, 2000);
                     
-        //             operationService.save({...data, strategy: STRATEGY})
-        //             .then(data => {
-        //                 console.log('data',data)
+                    operationService.save({...data,userId: strategy.userId, strategy: STRATEGY})
+                    .then(data => {
+                        console.log('data',data)
                         
-        //             })
-        //             .catch(err => {
-        //                     console.log('err',err)
-        //             })
-        // })
+                    })
+                    .catch(err => {
+                            console.log('err',err)
+                    })
+        })
         
         
-        if( rsi < 30 && !isOpened ){
+        /*if( rsi < 30 && !isOpened ){
             console.log('Sobrevendido, hora de comprar');
             isOpened = true
-            saveEnvVariable('IS_OPENED_RSI', isOpened);
+            //saveEnvVariable('IS_OPENED_RSI', isOpened);
+            strategyService.update(strategy.id, {isOpened})
             content += `Comprar\n\n`
             save(content)
-            newOrder.newOrder(SYMBOL, QUANTITY, SIDE.BUY)
+            newOrder.newOrder(symbol, quantity, SIDE.BUY)
                 .then(async data => {
                     lastBuyOrder = data
-                    await operationService.save({...data, strategy: STRATEGY}) 
+                    await operationService.save({...data, userId: strategy.userId, strategy: STRATEGY}) 
                     resolve({})
                 })
                 .catch(err => {
-                    errorService.save({...err, strategy: STRATEGY})
+                    errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
                     reject({})
                 })
         }else if( rsi > 70 && isOpened ){
@@ -136,8 +146,9 @@ const start = () => {
             content += `Vender\n\n`
             save(content)
             isOpened = false
-            saveEnvVariable('IS_OPENED_RSI', isOpened);
-            newOrder.newOrder(SYMBOL, QUANTITY, SIDE.SELL)
+            //saveEnvVariable('IS_OPENED_RSI', isOpened);
+            strategyService.update(strategy.id, {isOpened})
+            newOrder.newOrder(symbol, quantity, SIDE.SELL)
             .then(async data => {
                 if( lastBuyOrder ){
                     const profitResult = calculateProfit(lastBuyOrder, data);
@@ -149,15 +160,15 @@ const start = () => {
                     console.log('quntidade',`$${profitResult.quantity}`)
                     console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
                     console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
-                    balanceService.save(profitResult)
+                    balanceService.save({...profitResult, userId: strategy.userId})
                     
                     lastBuyOrder = null
                 }
-                await operationService.save({...data, strategy: STRATEGY})
+                await operationService.save({...data, userId: strategy.userId, strategy: STRATEGY})
                 resolve({})
             })
             .catch(err => {
-                errorService.save({...err, strategy: STRATEGY})
+                errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
                 reject({})
             })
             
@@ -165,7 +176,7 @@ const start = () => {
         }else{
             console.log('Aguardar');
             resolve({})   
-        }
+        }*/
     })
     
 }
@@ -178,27 +189,40 @@ const startRSI = () => {
     connect()
     .then(()=> {
         console.log('Conectado ao MongoDB!');
-        const job = new CronJob(
-            '*/3 * * * * *',
-            async () => {
-                start()
-                  .then(()=>console.log('Operaçao realizada'))
-                  .catch(()=> {
-                    console.log('Falha');
-                    job.stop()
-                    setTimeout(() => {
-                        console.log('Tentanto novamente');
-                        
-                        startRSI()
-                    }, 5000);
-                  })
-                
-            },
-            null, // onComplete
-            true, // start
-            'America/Sao_Paulo' // ajuste para seu fuso horário
+        
+        UserService.getApproved()
+        .then(async resp => {
+            console.log('chatid',resp[0]);
             
-        )
+            telegram.setSetChatId( resp[0].chatId )
+            
+            const strategy = await strategyService.find({userId: resp[0]._id, strategy: 'RSI'})
+            strategy.forEach(element => {
+                isOpened = element.isOpened
+                const job = new CronJob(
+                    '*/3 * * * * *',
+                    async () => {
+                        start(element)
+                          .then(()=>console.log('Operaçao realizada'))
+                          .catch(e=> {
+                            console.log('Falha',e.message);
+                            job.stop()
+                            setTimeout(() => {
+                                console.log('Tentanto novamente');
+                                
+                                startRSI()
+                            }, 5000);
+                          })
+                        
+                    },
+                    null, // onComplete
+                    true, // start
+                    'America/Sao_Paulo' // ajuste para seu fuso horário
+                    
+                )
+            })
+        })
+        
     }).catch(e => {
         console.error('Erro ao conectar ao MongoDB:', e.message)
         console.log('Tentaremos novamente em 1 minuto');
