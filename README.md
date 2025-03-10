@@ -11,3 +11,14 @@ RSI e Preço
 ## MongoDB
 
 https://cloud.mongodb.com/
+
+Documentação de algumas rotas
+
+    http://localhost:3000/api-docs/#/
+
+Para acessar crie seus dados 
+
+    LOGIN=
+    SENHA=
+
+no arquivo .env

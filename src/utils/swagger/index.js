@@ -3,6 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const package = require('../../../package.json')
 const basicAuth = require('express-basic-auth');
+const {LOGIN, SENHA} = process.env
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -30,7 +31,7 @@ const swaggerSpec = swaggerJsdoc(options);
 
 // Configurações de autenticação
 const users = {
-  'cbcarlos': 'brito1985' // Defina o usuário e a senha aqui
+  [LOGIN]: SENHA // Defina o usuário e a senha aqui
 };
 
 router.use(basicAuth({
