@@ -1,0 +1,59 @@
+image: node:16
+
+stages:
+ 
+  - deploy_dev
+  - deploy_hml
+  - deploy_prd
+
+cache:
+  key: node-common
+  paths:
+    - node_modules/
+
+variables: 
+  SOURCE: '/home/carlos/Projetos/robo-cripto'
+  PROJECT: 'robo-crypto-prd:3008'
+
+
+deploy_hml:
+  stage: deploy_hml
+  cache:
+    key: node-common
+    paths:
+      - node_modules/
+  only:
+    - homolog
+    - feat/inicial
+  script:
+    - rm -rf $SOURCE/back-end/$CI_COMMIT_BRANCH
+    - mkdir -p $SOURCE/back-end/$CI_COMMIT_BRANCH
+    - cp -R $CI_PROJECT_DIR/* $SOURCE/back-end/$CI_COMMIT_BRANCH
+    - npm i
+  artifacts:
+    expire_in: 1 day
+  tags:
+    - tundun
+
+
+deploy_prd:
+  stage: deploy_prd
+#  when: manual
+  cache:
+    key: node-common
+    paths:
+      - node_modules/
+  only:
+    - master
+  script:
+    - rm -rf $SOURCE/back-end/$CI_COMMIT_BRANCH
+    - mkdir -p $SOURCE/back-end/$CI_COMMIT_BRANCH
+    - cp -R $CI_PROJECT_DIR/* $SOURCE/back-end/$CI_COMMIT_BRANCH
+    - cd $SOURCE/back-end/$CI_COMMIT_BRANCH && npm i
+    - cd $SOURCE/back-end/$CI_COMMIT_BRANCH
+    - cp ../config/env .env
+    - pm2 reload $PROJECT
+  artifacts:
+    expire_in: 1 day
+  tags:
+    - back
