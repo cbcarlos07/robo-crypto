@@ -37,6 +37,23 @@ class Repository {
     delete(data){
         return this.model.deleteOne(data)
     }
+
+    findOneAndUpdate(data){
+        console.log('findOneAndUpdate data',data);
+        
+        return this.model.findOneAndUpdate(
+            { ...data.valueFind }, 
+            { $setOnInsert: { 
+                ...data.value,
+                ...data.valueFind  
+                } 
+            },
+            { 
+                upsert: true,
+                new: true
+            }
+        )
+    }
 }
 
 module.exports = Repository

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const UserRepository = require("../repository/UserRepository")
 const BaseService = require("./base.service")
 
+const ConfigSingleton = require('../../utils/ConfigSingleton')
 const { JWT_SECRET } = process.env
 class UserService extends BaseService{
     
@@ -25,8 +26,7 @@ class UserService extends BaseService{
     
     auth ( data ) {
         return new Promise(async(resolve, reject)=>{
-            console.log('auth ',data);
-            
+    
             let msg = 'Login ou senha inválidos'
             let statusCode = 400
             let status = false
@@ -44,7 +44,7 @@ class UserService extends BaseService{
                         })
                 
              
-            console.log('email',respEmail);
+            
             let obj = {}
             if( respEmail ){
                 const {name, email, username}= respEmail
@@ -58,6 +58,8 @@ class UserService extends BaseService{
             
             if( respEmail ){
                 //await this.update({id: respEmail.id}, {refreshToken})                
+                ConfigSingleton.set('token', token)
+            
                 resolve({statusCode, status, data: obj, token, refreshToken, msg})
             }else{
                 reject({message: msg, statusCode: 403})

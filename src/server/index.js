@@ -13,6 +13,7 @@ const connect = require('../config/db/connection');
 
 const server = require('http').createServer(app); 
 
+
 connect()
 
 // const io = socketIO(server, {
@@ -63,6 +64,7 @@ const exclusions = [
     '/',
     '/auth',
     '/create',
+    '/api-docs',
   ]
 app.use(jwt({exclusions}))
 fnRouterConfig({app})

@@ -48,76 +48,43 @@ const start = (strategy,user) => {
         console.log('BUY_PRICE', buyPrice);
         console.log('SELL_PRICE', sellPrice);
         
+        const valueBuy = await newOrder.newOrder(symbol, quantity, SIDE.BUY, user.apiKey)
     
+        lastBuyOrder = valueBuy
+        const _price = valueBuy.fills[0].price
+        const qtd = valueBuy.executedQty
+        const total = parseFloat(_price * qtd).toFixed(2)
+        console.log('Compra');
+        console.log('Preço',_price);
+        console.log('Qtde',qtd);
+        console.log('Total',total);
+        const save1 = await operationService.save({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
+        console.log('save1',save1);
         
         
-        if( price <= buyPrice && !isOpened ){
-            console.warn('Comprar');
-            isOpened = true
-            strategyService.update(strategy.id, {isOpened}).then(resp => console.log('strategy', resp))
-            saveEnvVariable('IS_OPENED_PRICE', isOpened);
-            newOrder.newOrder(symbol, quantity, SIDE.BUY, strategy.userId, user.apiKey)
-                .then(valueBuy => {
-                    lastBuyOrder = valueBuy
-                    const _price = valueBuy.fills[0].price
-                    const qtd = valueBuy.executedQty
-                    const total = parseFloat(_price * qtd).toFixed(2)
-                    console.log('Compra');
-                    console.log('Preço',_price);
-                    console.log('Qtde',qtd);
-                    console.log('Total',total);
-                    const conteMsg = `
-            Compra
-        Preço: *$${_price}*
-        Quantidade: *$${qtd}*
-        Total: *${total}*
-            `
-                    telegram.sendMessage( conteMsg )
-                    operationService.save({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
-                        .then(d => {
-                            console.log('salvou operacao', d)
-                            resolve({})
-                        })
-                })
-                .catch(err => {
-                    errorService.save({...err, strategy: STRATEGY})
-                    reject(err)
-                })
-    
-            //await operationService.save( {...obj, side: SIDE.BUY} )
-        }else if( price >= sellPrice && isOpened ){
-            console.log('Vender');
-            isOpened = false
-            saveEnvVariable('IS_OPENED_PRICE', isOpened);
-            strategyService.update(strategy.id, {isOpened})
-            newOrder.newOrderStrategyPrice(symbol, quantity, SIDE.SELL, user.apiKey)
-                .then(async data => {
-                    if( lastBuyOrder ){
-                        const profitResult = calculateProfit(lastBuyOrder, data);
-                        const content = prepareMsg(profitResult)
-                        telegram.sendMessage(content)
-                        console.log('Venda');
-                        console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
-                        console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
-                        console.log('quntidade',`$${profitResult.quantity}`)
-                        console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
-                        console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
-                        balanceService.save({...profitResult, userId: strategy.userId})
-                        
-                        lastBuyOrder = null
-                    }    
-                    await operationService.save({...data, strategy: STRATEGY})
-                    resolve({})
-                })
-                .catch(err => {
-                    errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
-                    reject(err)
-                })
-        }else{
-            console.log('Aguardar');
-            resolve({})
+                
+        const valueSell = await newOrder.newOrder(symbol, quantity, SIDE.SELL, user.apiKey)
+        if( lastBuyOrder ){
+            const profitResult = calculateProfit(lastBuyOrder, valueSell);
+            console.log('Venda');
+            console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
+            console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
+            console.log('quntidade',`$${profitResult.quantity}`)
+            console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
+            console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
+            balanceService.save({...profitResult,userId: strategy.userId })
             
+            lastBuyOrder = null
+            
+    
         }
+                    
+        await operationService.save({...valueSell, userId: strategy.userId, strategy: STRATEGY})
+        
+        setTimeout(() => {
+            process.exit(0)
+        }, 2000);
+             
     })
     
     
@@ -134,7 +101,6 @@ const startPrice = async () => {
         UserService.getApproved()
             .then(async resp => {
                 resp.forEach(async u => {
-
                     telegram.setSetChatId( u.chatId )
                     
                     const strategy = await strategyService.find({userId: u._id, strategy: 'PRICE'})
@@ -145,6 +111,7 @@ const startPrice = async () => {
                             '*/3 * * * * *',
                             async () => {
                                 
+                                console.log('user', u);
                                 
                                 start(element, u)
                                   .then(()=>console.log('Operaçao realizada'))
@@ -162,6 +129,7 @@ const startPrice = async () => {
                         
                         )
                     });
+
                 })
                 
             })

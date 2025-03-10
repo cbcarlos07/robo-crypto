@@ -1,4 +1,6 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const ConfigSingleton = require('../../utils/ConfigSingleton');
+
 const jwtMiddleware = (deps) => {
   return async (req, res, next) => {
     
@@ -8,7 +10,8 @@ const jwtMiddleware = (deps) => {
     });
     
     if (!isExcluded) {
-      const token = req.headers['x-access-token']
+      //const token = req.headers['x-access-token']
+      const token = ConfigSingleton.get('token')
       if (!token) {
         //res.status(403).json({error: 'Token não fornecido'})
         next({status: 403, message: 'Token não fornecido'})

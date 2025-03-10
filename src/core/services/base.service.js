@@ -27,6 +27,10 @@ class BaseService{
     delete(data){
         return this.repository.delete(data)
     }
+
+    findOneAndUpdate(data){
+        return this.repository.findOneAndUpdate(data)
+    }
 }
 
 module.exports = BaseService

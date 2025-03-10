@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const BaseRouter = require("../base.router");
 const userController = require('../../controllers/user.controller')
+const initController = require('../../controllers/init.controller')
 const pkg = require('../../../../package.json')
 
 class InitRouter extends BaseRouter{
@@ -14,7 +15,7 @@ class InitRouter extends BaseRouter{
                 version: pkg.version
                })
         })
-        this.router.post(`/create`, userController.save.bind( userController ))
+        this.router.post(`/create`, initController.save.bind( initController ))
         this.router.patch(`/auth`, userController.auth.bind( userController ))
 
         return this.router

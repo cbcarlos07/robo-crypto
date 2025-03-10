@@ -104,61 +104,26 @@ const start = (strategy, user) => {
         
         
         
-        
-        
-        if( rsi < 30 && !isOpened ){
-            console.log('Sobrevendido, hora de comprar');
-            isOpened = true
-            //saveEnvVariable('IS_OPENED_RSI', isOpened);
-            strategyService.update(strategy.id, {isOpened})
-            content += `Comprar\n\n`
-            save(content)
-            newOrder.newOrder(symbol, quantity, SIDE.BUY, user.apiKey)
-                .then(async data => {
-                    lastBuyOrder = data
-                    await operationService.save({...data, userId: strategy.userId, strategy: STRATEGY}) 
-                    resolve({})
-                })
-                .catch(err => {
-                    errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
-                    reject({})
-                })
-        }else if( rsi > 70 && isOpened ){
-            console.log('Sobrecomprado, hora de Vender');
-            content += `Vender\n\n`
-            save(content)
-            isOpened = false
-            //saveEnvVariable('IS_OPENED_RSI', isOpened);
-            strategyService.update(strategy.id, {isOpened})
-            newOrder.newOrder(symbol, quantity, SIDE.SELL, user.apiKey)
-            .then(async data => {
-                if( lastBuyOrder ){
-                    const profitResult = calculateProfit(lastBuyOrder, data);
-                    const _content = prepareMsg(profitResult)
-                    telegram.sendMessage( _content )
-                    console.log('Venda');
-                    console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)
-                    console.log('preço de venda',`$${profitResult.sellPrice.toFixed(2)}`)
-                    console.log('quntidade',`$${profitResult.quantity}`)
-                    console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
-                    console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
+        newOrder.newOrder(symbol, quantity, SIDE.SELL, user.apiKey).then(data =>{
+                    const profitResult = calculateProfit(data, data);
+                    const content = prepareMsg(profitResult)
                     balanceService.save({...profitResult, userId: strategy.userId})
+                    strategyService.update(strategy.id, {isOpened: true})
+                    telegram.sendMessage( content )
+                    setTimeout(() => {
+                        process.exit(0)    
+                    }, 2000);
                     
-                    lastBuyOrder = null
-                }
-                await operationService.save({...data, userId: strategy.userId, strategy: STRATEGY})
-                resolve({})
-            })
-            .catch(err => {
-                errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
-                reject({})
-            })
-            
-            
-        }else{
-            console.log('Aguardar');
-            resolve({})   
-        }
+                    operationService.save({...data,userId: strategy.userId, strategy: STRATEGY})
+                    .then(data => {
+                        console.log('data',data)
+                        
+                    })
+                    .catch(err => {
+                            console.log('err',err)
+                    })
+        })
+        
     })
     
 }
@@ -175,8 +140,7 @@ const startRSI = () => {
         UserService.getApproved()
         .then(async resp => {
             resp.forEach(async u => {
-                console.log('chatid',u);
-                
+
                 telegram.setSetChatId( u.chatId )
                 
                 const strategy = await strategyService.find({userId: u._id, strategy: 'RSI'})
@@ -204,8 +168,8 @@ const startRSI = () => {
                         
                     )
                 })
-
             })
+            
         })
         
     }).catch(e => {
