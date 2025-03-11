@@ -51,7 +51,7 @@ const getBalance = async chatId => {
             console.log('res', res);
             
             const content = `
-Saldo: *${res[0].totalProfit}*
+Saldo: *${res[0].totalProfit.toFixed(2)}*
   `
                 sendMessage(content)
             }).catch(e => {
