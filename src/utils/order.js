@@ -13,7 +13,7 @@ const newOrder = (symbol, quantity, side, user) => {
 
         const order = {symbol, quantity, side}
         order.type = 'MARKET'
-        order.timestamp = Date.now()
+        order.timestamp = await getBinanceServerTime(user)
     
         const signature = crypto
                             .createHmac('sha256', user.secretKey )
@@ -48,15 +48,6 @@ const newOrder = (symbol, quantity, side, user) => {
     })
 }
 
-const getExchangeInfo = async (symbol) => {
-    try {
-        const { data } = await axios.get(`${API_URL}/api/v3/exchangeInfo?symbol=${symbol}`)
-        return data.symbols[0].filters
-    } catch (error) {
-        console.error('Erro ao obter informações do par:', error)
-        throw error
-    }
-}
 
 // Função para ajustar a quantidade de acordo com as regras
 const adjustQuantity = (quantity, lotSize) => {
@@ -76,90 +67,18 @@ const adjustQuantity = (quantity, lotSize) => {
 }
 
 
-const newOrderPrice = async (symbol, price, side, quoteOrderQty) => {
+
+
+const getBinanceServerTime = async user => {
     try {
-        // Obtém as regras do par
-        const filters = await getExchangeInfo(symbol)
-        const lotSize = filters.find(f => f.filterType === 'LOT_SIZE')
-        
-        // Calcula e ajusta a quantidade
-        let quantity = quoteOrderQty / price
-        quantity = adjustQuantity(quantity, lotSize)
-
-        console.log('Quantidade ajustada:', quantity)
-
-        const order = {
-            symbol: symbol,
-            side: side,
-            type: 'LIMIT',
-            timeInForce: 'GTC',
-            quantity: quantity,
-            price: price.toFixed(2),
-            timestamp: Date.now()
-        }
-
-        const signature = crypto
-            .createHmac('sha256', SECRET_KEY)
-            .update(new URLSearchParams(order).toString())
-            .digest('hex')
-
-        order.signature = signature
-
-        console.log('Enviando ordem:', order)
-
-        const { data } = await axios.post(
-            `${API_URL}/api/v3/order`,
-            new URLSearchParams(order).toString(),
-            {
-                headers: { 'X-MBX-APIKEY': API_KEY }
-            }
-        )
-        return data
+      const response = await axios.get(`${user.url}/api/v3/time`);
+      return response.data.serverTime;
     } catch (error) {
-        console.error('Erro detalhado:', error.response ? error.response.data : error)
-        throw error.response ? error.response.data : error
+      console.error('Erro ao obter timestamp da Binance:', error);
+      return Date.now();
     }
-}
-
-const newOrderStrategyPrice = (symbol, quantity, side) => {
-    return new Promise(async(resolve, reject)=>{
-
-        const data = {
-            symbol,
-            side,
-            quantity,
-            type: 'MARKET',
-            timestamp: Date.now(),
-            recvWindow: 60000
-        }
-    
-        const signature = crypto
-                                .createHmac('sha256', SECRET_KEY)
-                                .update(`${new URLSearchParams(data)}`)
-                                .digest('hex')
-    
-        const newData = {...data, signature}
- 
-        try {            
-            const result = await axios.post(
-                                    `${API_URL}/api/v3/order`,
-                                    new URLSearchParams(newData).toString(),
-                                    {
-                                        headers: {'X-MBX-APIKEY' : API_KEY}
-                                    }
-            )
-            console.log(result.data);
-            resolve(result.data)
-        } catch (error) {
-            console.error('error',error)
-            reject(error.response.data)
-            
-        }
-    })
-
-}
+  }
 
 
 
-
-module.exports = {newOrderPrice, newOrderStrategyPrice, newOrder}
+module.exports = {newOrder}

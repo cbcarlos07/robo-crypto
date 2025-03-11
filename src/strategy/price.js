@@ -69,10 +69,10 @@ const start = (strategy,user) => {
                     console.log('Qtde',qtd);
                     console.log('Total',total);
                     const conteMsg = `
-            Compra
-        Preço: *$${_price}*
-        Quantidade: *$${qtd}*
-        Total: *${total}*
+Compra
+Preço: *$${_price}*
+Quantidade: *$${qtd}*
+Total: *${total}*
             `
                     telegram.sendMessage( conteMsg )
                     operationService.save({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
@@ -92,7 +92,7 @@ const start = (strategy,user) => {
             isOpened = false
             saveEnvVariable('IS_OPENED_PRICE', isOpened);
             strategyService.update(strategy.id, {isOpened})
-            newOrder.newOrderStrategyPrice(symbol, quantity, SIDE.SELL, user)
+            newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
                 .then(async data => {
                     if( lastBuyOrder ){
                         const profitResult = calculateProfit(lastBuyOrder, data);
