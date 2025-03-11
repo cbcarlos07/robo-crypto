@@ -130,7 +130,7 @@ const start = (strategy, user) => {
             .then(async data => {
                 if( lastBuyOrder ){
                     const profitResult = calculateProfit(lastBuyOrder, data);
-                    const _content = prepareMsg(profitResult)
+                    const _content = prepareMsg({...profitResult, strategy: 'RSI'})
                     telegram.sendMessage( _content )
                     console.log('Venda');
                     console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)

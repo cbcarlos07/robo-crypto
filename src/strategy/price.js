@@ -69,9 +69,9 @@ const start = (strategy,user) => {
                     console.log('Qtde',qtd);
                     console.log('Total',total);
                     const conteMsg = `
-Compra
-Preço: *$${_price}*
-Quantidade: *$${qtd}*
+Compra - PRICE
+Preço: *$${_price.toFixed(2)}*
+Quantidade: *${qtd}*
 Total: *${total}*
             `
                     telegram.sendMessage( conteMsg )
@@ -96,7 +96,7 @@ Total: *${total}*
                 .then(async data => {
                     if( lastBuyOrder ){
                         const profitResult = calculateProfit(lastBuyOrder, data);
-                        const content = prepareMsg(profitResult)
+                        const content = prepareMsg({...profitResult, strategy: 'PRICE'})
                         telegram.sendMessage(content)
                         console.log('Venda');
                         console.log('preço de compra',`$${profitResult.buyPrice.toFixed(2)}`)

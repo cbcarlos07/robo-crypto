@@ -106,7 +106,7 @@ const start = (strategy, user) => {
         
         newOrder.newOrder(symbol, quantity, SIDE.SELL, user).then(data =>{
                     const profitResult = calculateProfit(data, data);
-                    const content = prepareMsg(profitResult)
+                    const content = prepareMsg({...profitResult, strategy: 'RSI'})
                     balanceService.save({...profitResult, userId: strategy.userId})
                     strategyService.update(strategy.id, {isOpened: true})
                     telegram.sendMessage( content )
