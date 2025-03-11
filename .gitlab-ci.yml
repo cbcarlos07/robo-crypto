@@ -13,7 +13,7 @@ cache:
 
 variables: 
   SOURCE: '/home/carlos/Projetos/robo-crypto'
-  PROJECT: 'robo-crypto-prd:3008'
+  PROJECT: 'robo-crypto-prd:3009'
 
 
 deploy_hml:
