@@ -49,22 +49,6 @@ const newOrder = (symbol, quantity, side, user) => {
 }
 
 
-// Função para ajustar a quantidade de acordo com as regras
-const adjustQuantity = (quantity, lotSize) => {
-    const minQty = parseFloat(lotSize.minQty)
-    const maxQty = parseFloat(lotSize.maxQty)
-    const stepSize = parseFloat(lotSize.stepSize)
-    
-    // Ajusta para o stepSize
-    quantity = Math.floor(quantity / stepSize) * stepSize
-    
-    // Limita entre min e max
-    quantity = Math.max(minQty, Math.min(maxQty, quantity))
-    
-    // Ajusta casas decimais
-    const decimals = lotSize.stepSize.indexOf('1') - 1
-    return quantity.toFixed(Math.max(decimals, 0))
-}
 
 
 

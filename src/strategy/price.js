@@ -54,8 +54,10 @@ const start = (strategy,user) => {
         if( price <= buyPrice && !isOpened ){
             console.warn('Comprar');
             isOpened = true
+            console.log('isOpened',isOpened);
+            
             strategyService.update(strategy.id, {isOpened}).then(resp => console.log('strategy', resp))
-            saveEnvVariable('IS_OPENED_PRICE', isOpened);
+            
             console.log('price user',user);
             
             newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
@@ -91,7 +93,8 @@ Total: *${total}*
         }else if( price >= sellPrice && isOpened ){
             console.log('Vender');
             isOpened = false
-            saveEnvVariable('IS_OPENED_PRICE', isOpened);
+            console.log('isOpened',isOpened);
+            
             strategyService.update(strategy.id, {isOpened})
             newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
                 .then(async data => {
