@@ -6,8 +6,13 @@ class BalanceRSIRepository extends Repository{
         super(model)
     }
 
-    sum(){
+    sum(userId){
         return this.model.aggregate([
+              {
+                $match: {
+                    userId
+                }
+            },
             {
               $group: {
                 _id: null,

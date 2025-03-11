@@ -37,8 +37,8 @@ const start = (strategy,user) => {
         const quantity = strategy.quantity
         
         console.log('Estratégia PRECO');
-        const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
-        //console.log('data',data);
+        const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
+        
         
         const candle = data[ data.length - 1 ]
         const price = parseFloat( candle[4] ) 
@@ -56,7 +56,7 @@ const start = (strategy,user) => {
             isOpened = true
             strategyService.update(strategy.id, {isOpened}).then(resp => console.log('strategy', resp))
             saveEnvVariable('IS_OPENED_PRICE', isOpened);
-            newOrder.newOrder(symbol, quantity, SIDE.BUY, strategy.userId, user.apiKey)
+            newOrder.newOrder(symbol, quantity, SIDE.BUY, strategy.userId, user)
                 .then(valueBuy => {
                     lastBuyOrder = valueBuy
                     const _price = valueBuy.fills[0].price
@@ -90,7 +90,7 @@ const start = (strategy,user) => {
             isOpened = false
             saveEnvVariable('IS_OPENED_PRICE', isOpened);
             strategyService.update(strategy.id, {isOpened})
-            newOrder.newOrderStrategyPrice(symbol, quantity, SIDE.SELL, user.apiKey)
+            newOrder.newOrderStrategyPrice(symbol, quantity, SIDE.SELL, user)
                 .then(async data => {
                     if( lastBuyOrder ){
                         const profitResult = calculateProfit(lastBuyOrder, data);
@@ -130,6 +130,7 @@ const start = (strategy,user) => {
 const startPrice = async () => {
     connect()
     .then(() => {
+        
         console.log('Conectado ao MongoDB!');
         UserService.getApproved()
             .then(async resp => {

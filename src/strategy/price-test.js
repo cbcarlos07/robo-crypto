@@ -5,12 +5,12 @@ const { format } = require('date-fns')
 
 const connect = require('../config/db/connection')
 const operationService = require('../core/services/operation.service')
-const { saveEnvVariable } = require('../utils/file')
+
 const newOrder = require('../utils/order')
-const errorService = require('../core/services/error.service')
+
 const calculateProfit = require('../utils/calculateProfit')
 const balanceService = require('../core/services/balance.service')
-const prepareMsg = require('../utils/prepareMsg')
+
 const telegram = require('../utils/telegram')
 const UserService = require('../core/services/user.service')
 const strategyService = require('../core/services/strategy.service')
@@ -29,7 +29,7 @@ let lastBuyOrder = null;
 
 const start = (strategy,user) => {
     return new Promise(async(resolve,reject)=> {
-
+        
         console.clear()
         const symbol = strategy.symbol
         const buyPrice = strategy.buyPrice
@@ -37,8 +37,8 @@ const start = (strategy,user) => {
         const quantity = strategy.quantity
         
         console.log('Estratégia PRECO');
-        const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
-        //console.log('data',data);
+        const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
+        
         
         const candle = data[ data.length - 1 ]
         const price = parseFloat( candle[4] ) 
@@ -48,8 +48,8 @@ const start = (strategy,user) => {
         console.log('BUY_PRICE', buyPrice);
         console.log('SELL_PRICE', sellPrice);
         
-        const valueBuy = await newOrder.newOrder(symbol, quantity, SIDE.BUY, user.apiKey)
-    
+        const valueBuy = await newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
+        
         lastBuyOrder = valueBuy
         const _price = valueBuy.fills[0].price
         const qtd = valueBuy.executedQty
@@ -62,8 +62,8 @@ const start = (strategy,user) => {
         console.log('save1',save1);
         
         
-                
-        const valueSell = await newOrder.newOrder(symbol, quantity, SIDE.SELL, user.apiKey)
+        
+        const valueSell = await newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
         if( lastBuyOrder ){
             const profitResult = calculateProfit(lastBuyOrder, valueSell);
             console.log('Venda');
@@ -76,15 +76,15 @@ const start = (strategy,user) => {
             
             lastBuyOrder = null
             
-    
+            
         }
-                    
+        
         await operationService.save({...valueSell, userId: strategy.userId, strategy: STRATEGY})
         
         setTimeout(() => {
             process.exit(0)
         }, 2000);
-             
+        
     })
     
     
@@ -95,55 +95,58 @@ const start = (strategy,user) => {
 //setInterval(start,3000)
 
 const startPrice = async () => {
-    connect()
-    .then(() => {
-        console.log('Conectado ao MongoDB!');
-        UserService.getApproved()
-            .then(async resp => {
-                resp.forEach(async u => {
-                    telegram.setSetChatId( u.chatId )
-                    
-                    const strategy = await strategyService.find({userId: u._id, strategy: 'PRICE'})
-                    
-                    strategy.forEach(element => {
-                        isOpened = element.isOpened
-                        const job = new CronJob(
-                            '*/3 * * * * *',
-                            async () => {
-                                
-                                console.log('user', u);
-                                
-                                start(element, u)
-                                  .then(()=>console.log('Operaçao realizada'))
-                                  .catch(e=> {
-                                    console.log('Falha',e.message);
-                                    job.stop()
-                                    setTimeout(() => {
-                                        startPrice()
-                                    }, 5000);
-                                  })
-                            },
-                            null, // onComplete
-                            true, // start
-                            'America/Sao_Paulo' // ajuste para seu fuso horário
+    const job = new CronJob(
+        '*/10 * * * * *',
+        async () => {
+            connect()
+            .then(() => {
+                console.log('Conectado ao MongoDB!');
+                UserService.getApproved()
+                .then(async resp => {
+                    resp.forEach(async u => {
+                        telegram.setSetChatId( u.chatId )
                         
-                        )
-                    });
-
+                        const strategy = await strategyService.find({userId: u._id, strategy: 'PRICE'})
+                        
+                        strategy.forEach(element => {
+                            isOpened = element.isOpened
+                            
+                            
+                            console.log('user', u);
+                            
+                            start(element, u)
+                            .then(()=>console.log('Operaçao realizada'))
+                            .catch(e=> {
+                                console.log('Falha',e.message);
+                                job.stop()
+                                setTimeout(() => {
+                                    startPrice()
+                                }, 5000);
+                            })
+                            
+                        });
+                        
+                    })
+                    
                 })
                 
+            }).catch(e => {
+                
+                console.error('Erro ao conectar ao MongoDB:', e.message);
+                console.log('Tentaremos depois de 1 minuto');
+                
+                setTimeout(() => {
+                    console.log('Tentando novamente');
+                    startPrice()
+                }, 5000);
             })
+            
+        },
+        null, // onComplete
+        true, // start
+        'America/Sao_Paulo' // ajuste para seu fuso horário
         
-      }).catch(e => {
-
-          console.error('Erro ao conectar ao MongoDB:', e.message);
-          console.log('Tentaremos depois de 1 minuto');
-          
-          setTimeout(() => {
-              console.log('Tentando novamente');
-              startPrice()
-          }, 5000);
-      })
+    )
     
 }
 

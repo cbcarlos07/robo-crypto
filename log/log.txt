@@ -2369,3 +2369,409 @@ Comprar
   "date": "10/03/2025 16:52:48"
 }
 
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3646422,
+  "orderListId": -1,
+  "clientOrderId": "JIquJ3E5e6E5P1SZBXSpRX",
+  "transactTime": 1741714082144,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "81.02851000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714082144,
+  "fills": [
+    {
+      "price": "81028.51000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 801739
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:28:02"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3647254,
+  "orderListId": -1,
+  "clientOrderId": "jSgiqKNNYLCcYsqzVmghbP",
+  "transactTime": 1741714181423,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "80.82006000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714181423,
+  "fills": [
+    {
+      "price": "80820.06000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 801945
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:29:41"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3647589,
+  "orderListId": -1,
+  "clientOrderId": "19VUviKywsJ7yZq9FADkq0",
+  "transactTime": 1741714212115,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "80.89577000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714212115,
+  "fills": [
+    {
+      "price": "80895.77000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 801993
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:30:12"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3649027,
+  "orderListId": -1,
+  "clientOrderId": "bmvsPxHWq7JVSOqExhiKZ0",
+  "transactTime": 1741714352205,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "80.98229000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714352205,
+  "fills": [
+    {
+      "price": "80982.29000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802337
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:32:32"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3649121,
+  "orderListId": -1,
+  "clientOrderId": "EuFf73gr8U637NQyR1HIZ0",
+  "transactTime": 1741714371427,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "80.98096000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714371427,
+  "fills": [
+    {
+      "price": "80980.96000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802366
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:32:51"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3649293,
+  "orderListId": -1,
+  "clientOrderId": "svj7FIJMUDugs1PbiV0ZrT",
+  "transactTime": 1741714392474,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "81.01488000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714392474,
+  "fills": [
+    {
+      "price": "81014.88000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802406
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:33:12"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3649727,
+  "orderListId": -1,
+  "clientOrderId": "qnIh11pWExJNPedyQwyDc6",
+  "transactTime": 1741714442097,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "81.04636000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714442097,
+  "fills": [
+    {
+      "price": "81046.36000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802517
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:34:02"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3650189,
+  "orderListId": -1,
+  "clientOrderId": "8Rqq5IEO4r9rZYoa4dPOqi",
+  "transactTime": 1741714491955,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "81.13450000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714491955,
+  "fills": [
+    {
+      "price": "81134.50000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802601
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:34:52"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3651152,
+  "orderListId": -1,
+  "clientOrderId": "Gte1hAOTWBg40MoyTgnTHt",
+  "transactTime": 1741714592628,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "81.00943000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714592628,
+  "fills": [
+    {
+      "price": "81009.43000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802727
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:36:32"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3651571,
+  "orderListId": -1,
+  "clientOrderId": "lWlS7UQy8ptaJ6QSNMNb1r",
+  "transactTime": 1741714641964,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "80.96198000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714641964,
+  "fills": [
+    {
+      "price": "80961.98000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802773
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:37:22"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3651720,
+  "orderListId": -1,
+  "clientOrderId": "ugnCHU0deYeuvMCBtcuii6",
+  "transactTime": 1741714663012,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "80.97232000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714663012,
+  "fills": [
+    {
+      "price": "80972.32000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802806
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:37:43"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3651992,
+  "orderListId": -1,
+  "clientOrderId": "uuye396ePAj3r1I044nyvo",
+  "transactTime": 1741714702463,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "80.98755000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714702463,
+  "fills": [
+    {
+      "price": "80987.55000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 802869
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:38:22"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3653273,
+  "orderListId": -1,
+  "clientOrderId": "49HZ6Od5EX1n682mi9C6pF",
+  "transactTime": 1741714862140,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "81.01776000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "BUY",
+  "workingTime": 1741714862140,
+  "fills": [
+    {
+      "price": "81017.76000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "BTC",
+      "tradeId": 803147
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:41:02"
+}
+
+{
+  "symbol": "BTCUSDT",
+  "orderId": 3653279,
+  "orderListId": -1,
+  "clientOrderId": "djvyAWxat7kyazke1KtYSi",
+  "transactTime": 1741714862873,
+  "price": "0.00000000",
+  "origQty": "0.00100000",
+  "executedQty": "0.00100000",
+  "origQuoteOrderQty": "0.00000000",
+  "cummulativeQuoteQty": "81.00773000",
+  "status": "FILLED",
+  "timeInForce": "GTC",
+  "type": "MARKET",
+  "side": "SELL",
+  "workingTime": 1741714862873,
+  "fills": [
+    {
+      "price": "81007.73000000",
+      "qty": "0.00100000",
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "tradeId": 803148
+    }
+  ],
+  "selfTradePreventionMode": "EXPIRE_MAKER",
+  "date": "11/03/2025 14:41:02"
+}
+

@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     dtApproved: {type: Date},
     apiKey: {type: String},
     secretKey: {type: String},
+    url: {type: String},
     obs: {type: String},
 }, { timestamps: true })
 

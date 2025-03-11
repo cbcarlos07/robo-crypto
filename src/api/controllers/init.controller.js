@@ -1,6 +1,8 @@
 const service = require("../../core/services/user.service");
 const BaseController = require("./base.controller");
 
+const { TOKEN } = process.env
+
 class InitController extends BaseController{
     constructor(service){
         super(service)
@@ -8,7 +10,7 @@ class InitController extends BaseController{
 
     save(req,res,next){
         const tokenAccess = req.headers['x-access-token']
-        if( token === tokenAccess ){
+        if( TOKEN === tokenAccess ){
             this.service.save(req.body)
                         .then(resp => {
                             res.status(this.StatusCodes.CREATED).json({data: resp, msg: this.messages.created})

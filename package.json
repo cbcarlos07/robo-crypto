@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src",
     "rsi": "node src/index-job rsi",
-    "rsi:test": "node src/index-job-test rsi",
+    "rsi:test": "nodemon src/index-job-test rsi",
     "price": "node src/index-job price",
     "price:test": "node src/index-job-test price",
     "balance": "node src/index-job balance"

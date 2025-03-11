@@ -74,19 +74,15 @@ const RSI = (prices, period) => {
 const start = (strategy, user) => {
     return new Promise(async(resolve, reject)=>{
         const symbol = strategy.symbol
-        const buyPrice = strategy.buyPrice
-        const sellPrice = strategy.sellPrice
         const quantity = strategy.quantity
         const period = strategy.period
         
-
-
         console.clear()
         console.log('Estratégia RSI');
         console.log('IS_OPENED_RSI',isOpened);
         
         let content = ''
-        const { data } = await axios.get(`${API_URL}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
+        const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
         const candle = data[ data.length - 1 ]
         const lastPrice = parseFloat( candle[4] ) 
         const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
@@ -113,7 +109,7 @@ const start = (strategy, user) => {
             strategyService.update(strategy.id, {isOpened})
             content += `Comprar\n\n`
             save(content)
-            newOrder.newOrder(symbol, quantity, SIDE.BUY, user.apiKey)
+            newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
                 .then(async data => {
                     lastBuyOrder = data
                     await operationService.save({...data, userId: strategy.userId, strategy: STRATEGY}) 
@@ -130,7 +126,7 @@ const start = (strategy, user) => {
             isOpened = false
             //saveEnvVariable('IS_OPENED_RSI', isOpened);
             strategyService.update(strategy.id, {isOpened})
-            newOrder.newOrder(symbol, quantity, SIDE.SELL, user.apiKey)
+            newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
             .then(async data => {
                 if( lastBuyOrder ){
                     const profitResult = calculateProfit(lastBuyOrder, data);
@@ -167,57 +163,60 @@ const start = (strategy, user) => {
 
 //setInterval(start,3000)
 const startRSI = () => {
+    const job = new CronJob(
+        '*/10 * * * * *',
+        async () => {
     
-    connect()
-    .then(()=> {
-        console.log('Conectado ao MongoDB!');
-        
-        UserService.getApproved()
-        .then(async resp => {
-            resp.forEach(async u => {
-                console.log('chatid',u);
+            connect()
+            .then(()=> {
                 
-                telegram.setSetChatId( u.chatId )
+                console.log('Conectado ao MongoDB!');
                 
-                const strategy = await strategyService.find({userId: u._id, strategy: 'RSI'})
-                strategy.forEach(element => {
-                    isOpened = element.isOpened
-                    const job = new CronJob(
-                        '*/3 * * * * *',
-                        async () => {
-                            start(element, u)
-                              .then(()=>console.log('Operaçao realizada'))
-                              .catch(e=> {
-                                console.log('Falha',e.message);
-                                job.stop()
-                                setTimeout(() => {
-                                    console.log('Tentanto novamente');
-                                    
-                                    startRSI()
-                                }, 5000);
-                              })
-                            
-                        },
-                        null, // onComplete
-                        true, // start
-                        'America/Sao_Paulo' // ajuste para seu fuso horário
+                UserService.getApproved()
+                .then(async resp => {
+                    resp.forEach(async u => {
+                        console.log('chatid',u);
                         
-                    )
-                })
+                        telegram.setSetChatId( u.chatId )
+                        
+                        const strategy = await strategyService.find({userId: u._id, strategy: 'RSI'})
+                        strategy.forEach(element => {
+                            isOpened = element.isOpened
+                            
+                                    start(element, u)
+                                    .then(()=>console.log('Operaçao realizada'))
+                                    .catch(e=> {
+                                        console.log('Falha',e.message);
+                                        job.stop()
+                                        setTimeout(() => {
+                                            console.log('Tentanto novamente');
+                                            
+                                            startRSI()
+                                        }, 5000);
+                                    })
+                                    
+                                
+                        })
 
+                    })
+                })
+                
+            }).catch(e => {
+                console.error('Erro ao conectar ao MongoDB:', e.message)
+                console.log('Tentaremos novamente em 1 minuto');
+                setTimeout(() => {
+                    console.log('Tentando novamente');
+                    
+                    startRSI()
+                }, 5000);
+                
             })
-        })
-        
-    }).catch(e => {
-        console.error('Erro ao conectar ao MongoDB:', e.message)
-        console.log('Tentaremos novamente em 1 minuto');
-        setTimeout(() => {
-            console.log('Tentando novamente');
-            
-            startRSI()
-        }, 5000);
-        
-    })
+        },
+        null, // onComplete
+        true, // start
+        'America/Sao_Paulo' // ajuste para seu fuso horário
+
+    )
 }
 
 

@@ -7,8 +7,8 @@ class BalanceService extends BaseService {
         super(repository)
     }
 
-    sum(){
-        return this.repository.sum()
+    sum(id){
+        return this.repository.sum(id)
     }
 }
 

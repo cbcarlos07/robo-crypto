@@ -8,7 +8,7 @@ const { save, errorFn } = require('../utils/file')
 const { API_KEY, SECRET_KEY, API_URL } = process.env
 //const API_URL = 'https://testnet.binance.vision' //'https://testnet.binance.vision'; //https://api.binance.com
 
-const newOrder = (symbol, quantity, side, apiKey) => {
+const newOrder = (symbol, quantity, side, user) => {
     return new Promise(async (resolve, reject)=>{
 
         const order = {symbol, quantity, side}
@@ -16,7 +16,7 @@ const newOrder = (symbol, quantity, side, apiKey) => {
         order.timestamp = Date.now()
     
         const signature = crypto
-                            .createHmac('sha256', SECRET_KEY )
+                            .createHmac('sha256', user.secretKey )
                             .update( new URLSearchParams(order).toString() )
                             .digest('hex')
     
@@ -24,10 +24,10 @@ const newOrder = (symbol, quantity, side, apiKey) => {
     
         try {
             const { data } = await axios.post(
-                                        `${API_URL}/api/v3/order`,
+                                        `${user.url}/api/v3/order`,
                                         new URLSearchParams(order).toString(),
                                         {
-                                            headers: {'X-MBX-APIKEY' : apiKey}
+                                            headers: {'X-MBX-APIKEY' : user.apiKey}
                                         }
                                     )
             console.log(data);

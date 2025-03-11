@@ -85,6 +85,10 @@
  *                 type: string
  *                 description: Alguma observação
  *                 example: Qualquer texto
+ *               url: 
+ *                 type: string
+ *                 description: Secret key da binance 
+ *                 example: https://testnet.binance.vision
  *               chatId: 
  *                 type: string
  *                 description: Id do chat no telegram
