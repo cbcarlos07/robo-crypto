@@ -71,7 +71,7 @@ const start = (strategy,user) => {
                     console.log('Total',total);
                     const conteMsg = `
 Compra - PRICE
-Preço: *$${_price.toFixed(2)}*
+Preço: *$${Number(_price).toFixed(2)}*
 Quantidade: *${qtd}*
 Total: *${total}*
             `
