@@ -10,7 +10,6 @@ const start = () => {
     bot = new TelegramBot(token, { polling: true });
 
     bot.on('message', msg => {
-        console.log('msg', msg);
         
         if( msg.text === '/saldo' ){
             console.log('saldo');

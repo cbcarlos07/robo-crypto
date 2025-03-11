@@ -56,7 +56,9 @@ const start = (strategy,user) => {
             isOpened = true
             strategyService.update(strategy.id, {isOpened}).then(resp => console.log('strategy', resp))
             saveEnvVariable('IS_OPENED_PRICE', isOpened);
-            newOrder.newOrder(symbol, quantity, SIDE.BUY, strategy.userId, user)
+            console.log('price user',user);
+            
+            newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
                 .then(valueBuy => {
                     lastBuyOrder = valueBuy
                     const _price = valueBuy.fills[0].price
