@@ -65,7 +65,7 @@ const start = (strategy,user) => {
                     const qtd = valueBuy.executedQty
                     const total = parseFloat(_price * qtd).toFixed(2)
                     console.log('Compra');
-                    console.log('Preço',_price);
+                    console.log('Preço _price',_price);
                     console.log('Qtde',qtd);
                     console.log('Total',total);
                     const conteMsg = `
