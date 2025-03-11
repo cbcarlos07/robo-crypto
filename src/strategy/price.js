@@ -56,9 +56,10 @@ const start = (strategy,user) => {
             isOpened = true
             console.log('isOpened',isOpened);
             
-            strategyService.update(strategy.id, {isOpened}).then(resp => console.log('strategy', resp))
+            const strategyUpdated = await strategyService.update(strategy._id, {isOpened})
+            console.log('strategyUpdated', strategyUpdated);
             
-            console.log('price user',user);
+     
             
             newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
                 .then(valueBuy => {
@@ -72,7 +73,7 @@ const start = (strategy,user) => {
                     console.log('Qtde',qtd);
                     console.log('Total',total);
                     const conteMsg = `
-Compra - PRICE
+Compra - *PRICE*
 Preço: *$${Number(_price).toFixed(2)}*
 Quantidade: *${qtd}*
 Total: *${total}*
@@ -95,7 +96,8 @@ Total: *${total}*
             isOpened = false
             console.log('isOpened',isOpened);
             
-            strategyService.update(strategy.id, {isOpened})
+            const strategyUpdated = await strategyService.update(strategy._id, {isOpened})
+            console.log('strategyUpdated', strategyUpdated);
             newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
                 .then(async data => {
                     if( lastBuyOrder ){
