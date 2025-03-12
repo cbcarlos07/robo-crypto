@@ -1,19 +1,24 @@
 
 const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios')
 const balanceService = require('../core/services/balance.service');
 const userService = require('../core/services/user.service');
 const { TELEGRAM_TOKEN, TELEGRAM_CHATID } = process.env
 // Substitua 'SEU_TOKEN' pelo token do seu bot
 let bot = null
 const start = () => {
+    console.log('Iniciando telegram');
+    
     const token = TELEGRAM_TOKEN;
     bot = new TelegramBot(token, { polling: true });
 
     bot.on('message', msg => {
+        console.log('msg', msg);
         
         if( msg.text === '/saldo' ){
-            console.log('saldo');
             getBalance(msg.chat.id)
+        }else{
+            chatBot( msg )
         }
     })
     
@@ -58,9 +63,55 @@ Saldo: *${res[0].totalProfit.toFixed(2)}*
             console.log('e',e.message);
             sendMessage('Poxa! Infelizmente tivemos problemas para trazer o resultado 😞')
             })
-        } )
+        } )   
+}
 
+const chatBot = msg => {
+    console.log('chatBot',msg.chat.id);
     
+    userService.findOne({chatId: msg.chat.id})
+     .then(res => {
+        console.log('chatBot res',res);
+        
+        if(res){
+            sendMessage(`Olá *${res.name}*!`)
+            requestBot(msg, res._id)
+        }else{
+            sendMessage("Infelizmente seu cadastro não foi encontrado 🥺")
+        }
+     })
+}
+
+const requestBot = (msg, userId) => {
+    axios({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: {
+            type: "text",
+            text: msg.text
+        },
+        url: `http://127.0.0.1:3001/api/v1/bots/robo-crypto/converse/${userId}`
+    }).then(async res => {
+        const {responses} = res.data
+        
+        for (let index = 0; index < responses.length; index++) {
+            console.log('responses', responses[index]);
+            const {text, choices} = responses[index]
+            let choice = ''
+            if( choices ){
+        
+                const rows = choices.map(c => `> *${c.value}*: ${c.title}`)
+                choice = rows.join('\n')
+            }
+            const msg = `${text}\n${choice}`
+            console.log('msg', msg);
+            sendMessage( msg)
+            //await delay(message.from)   
+        }
+    }).catch(e =>{
+        console.log('error',e.response.data);
+        console.log('error',e.message);
+    })
 }
 
 // Exemplo de uso

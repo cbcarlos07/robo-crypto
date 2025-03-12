@@ -176,7 +176,6 @@ const startRSI = () => {
                 UserService.getApproved()
                 .then(async resp => {
                     resp.forEach(async u => {
-                        console.log('chatid',u);
                         
                         telegram.setSetChatId( u.chatId )
                         

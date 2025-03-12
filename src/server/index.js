@@ -16,7 +16,7 @@ const telegram = require('../utils/telegram')
 
 const {startPrice} = require('../strategy/price')
 const startRSI = require('../strategy/rsi')
-
+telegram.start()
 
 connect()
 
@@ -78,7 +78,6 @@ fnRouterConfig({app})
 
 ErrorsHandler(app)
 
-telegram.start()
-startPrice()
-startRSI()
+
+
 module.exports = server
