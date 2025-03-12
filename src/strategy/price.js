@@ -148,21 +148,22 @@ Total: *${total}*
 //setInterval(start,3000)
 
 const startPrice = async () => {
-    const job = new CronJob(
-        '*/10 * * * * *',
-        async () => {
-            
-            connect()
-            .then(() => {
-                
-                console.log('Conectado ao MongoDB!');
+    
+    
+    connect()
+    .then(() => {
+        
+        console.log('Conectado ao MongoDB!');
+        const job = new CronJob(
+            '*/10 * * * * *',
+            async () => {
                 UserService.getApproved()
                 .then(async resp => {
                     resp.forEach(async u => {
                         
                         telegram.setSetChatId( u.chatId )
                         
-                        const strategy = await strategyService.find({userId: u._id, strategy: 'PRICE'})
+                        const strategy = await strategyService.find({userId: u._id, strategy: 'PRICE', active: true})
                         
                         strategy.forEach(element => {
                             isOpened = element.isOpened
@@ -184,22 +185,24 @@ const startPrice = async () => {
                     
                 })
                 
-            }).catch(e => {
-                
-                console.error('Erro ao conectar ao MongoDB:', e.message);
-                console.log('Tentaremos depois de 1 minuto');
-                
-                setTimeout(() => {
-                    console.log('Tentando novamente');
-                    startPrice()
-                }, 5000);
-            })
-        },
-        null, // onComplete
-        true, // start
-        'America/Sao_Paulo' // ajuste para seu fuso horário
+            },
+            null, // onComplete
+            true, // start
+            'America/Sao_Paulo' // ajuste para seu fuso horário
+            
+        )
         
-    )
+    }).catch(e => {
+        
+        console.error('Erro ao conectar ao MongoDB:', e.message);
+        console.log('Tentaremos depois de 1 minuto');
+        
+        setTimeout(() => {
+            console.log('Tentando novamente');
+            startPrice()
+        }, 5000);
+    })
+    
     
 }
 

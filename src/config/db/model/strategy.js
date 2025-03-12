@@ -8,6 +8,7 @@ const strategySchema = new mongoose.Schema({
     sellPrice: {type: Number},
     quantity: {type: String},
     period: {type: Number},
+    active: {type: Boolean, default: false},
     userId: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'  // Nome do modelo referenciado 

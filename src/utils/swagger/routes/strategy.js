@@ -32,6 +32,10 @@
  *           type: string
  *           description: Id do usuario
  *           example: 67b4e238ea078d279a373f86
+ *         active:
+ *           type: boolean
+ *           description: status da estratégia
+ *           example: true
  *     PriceStrategy:
  *       required: [buyPrice, sellPrice]
  *       properties:

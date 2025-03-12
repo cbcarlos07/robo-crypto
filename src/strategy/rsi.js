@@ -20,7 +20,7 @@ const SYMBOL = 'BTCUSDT'
 const PERIOD = 14
 const QUANTITY = '0.001'
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
- //'https://testnet.binance.vision'; //https://api.binance.com
+//'https://testnet.binance.vision'; //https://api.binance.com
 const STRATEGY = 'RSI'
 
 
@@ -110,15 +110,15 @@ const start = (strategy, user) => {
             content += `Comprar\n\n`
             save(content)
             newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
-                .then(async data => {
-                    lastBuyOrder = data
-                    await operationService.save({...data, userId: strategy.userId, strategy: STRATEGY}) 
-                    resolve({})
-                })
-                .catch(err => {
-                    errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
-                    reject({})
-                })
+            .then(async data => {
+                lastBuyOrder = data
+                await operationService.save({...data, userId: strategy.userId, strategy: STRATEGY}) 
+                resolve({})
+            })
+            .catch(err => {
+                errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
+                reject({})
+            })
         }else if( rsi > 70 && isOpened ){
             console.log('Sobrecomprado, hora de Vender');
             content += `Vender\n\n`
@@ -163,14 +163,15 @@ const start = (strategy, user) => {
 
 //setInterval(start,3000)
 const startRSI = () => {
-    const job = new CronJob(
-        '*/10 * * * * *',
-        async () => {
     
-            connect()
-            .then(()=> {
-                
-                console.log('Conectado ao MongoDB!');
+    
+    connect()
+    .then(()=> {
+        
+        console.log('Conectado ao MongoDB!');
+        const job = new CronJob(
+            '*/10 * * * * *',
+            async () => {
                 
                 UserService.getApproved()
                 .then(async resp => {
@@ -179,44 +180,45 @@ const startRSI = () => {
                         
                         telegram.setSetChatId( u.chatId )
                         
-                        const strategy = await strategyService.find({userId: u._id, strategy: 'RSI'})
+                        const strategy = await strategyService.find({userId: u._id, strategy: 'RSI', active: true})
                         strategy.forEach(element => {
                             isOpened = element.isOpened
                             
-                                    start(element, u)
-                                    .then(()=>console.log('Operaçao realizada'))
-                                    .catch(e=> {
-                                        console.log('Falha',e.message);
-                                        job.stop()
-                                        setTimeout(() => {
-                                            console.log('Tentanto novamente');
-                                            
-                                            startRSI()
-                                        }, 5000);
-                                    })
+                            start(element, u)
+                            .then(()=>console.log('Operaçao realizada'))
+                            .catch(e=> {
+                                console.log('Falha',e.message);
+                                job.stop()
+                                setTimeout(() => {
+                                    console.log('Tentanto novamente');
                                     
-                                
+                                    startRSI()
+                                }, 5000);
+                            })
+                            
+                            
                         })
-
+                        
                     })
                 })
-                
-            }).catch(e => {
-                console.error('Erro ao conectar ao MongoDB:', e.message)
-                console.log('Tentaremos novamente em 1 minuto');
-                setTimeout(() => {
-                    console.log('Tentando novamente');
-                    
-                    startRSI()
-                }, 5000);
-                
-            })
-        },
-        null, // onComplete
-        true, // start
-        'America/Sao_Paulo' // ajuste para seu fuso horário
-
-    )
+            },
+            null, // onComplete
+            true, // start
+            'America/Sao_Paulo' // ajuste para seu fuso horário
+            
+        )
+        
+    }).catch(e => {
+        console.error('Erro ao conectar ao MongoDB:', e.message)
+        console.log('Tentaremos novamente em 1 minuto');
+        setTimeout(() => {
+            console.log('Tentando novamente');
+            
+            startRSI()
+        }, 5000);
+        
+    })
+    
 }
 
 
