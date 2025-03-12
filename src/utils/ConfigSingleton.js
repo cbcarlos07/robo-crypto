@@ -16,6 +16,10 @@ class ConfigSingleton {
         return this.config[key];
     }
 
+    destroy(key){
+        delete this.config[key]
+    }
+
     getAllConfig() {
         return this.config;
     }

@@ -3,7 +3,10 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios')
 const balanceService = require('../core/services/balance.service');
 const userService = require('../core/services/user.service');
+const ConfigSingleton = require('./ConfigSingleton');
 const { TELEGRAM_TOKEN, TELEGRAM_CHATID } = process.env
+const BOT_ID = 'robo-crypto'
+
 // Substitua 'SEU_TOKEN' pelo token do seu bot
 let bot = null
 const start = () => {
@@ -17,9 +20,10 @@ const start = () => {
         
         if( msg.text === '/saldo' ){
             getBalance(msg.chat.id)
-        }else{
-            chatBot( msg )
         }
+        // else{
+        //     chatBot( msg )
+        // }
     })
     
 }
@@ -68,18 +72,24 @@ Saldo: *${res[0].totalProfit.toFixed(2)}*
 
 const chatBot = msg => {
     console.log('chatBot',msg.chat.id);
+    console.log('getAllConfig',ConfigSingleton.getAllConfig());
+    if( !ConfigSingleton.get( msg.chat.id ) ){
+        userService.findOne({chatId: msg.chat.id})
+        .then(res => {
+           console.log('chatBot res',res);
+           
+           if(res){
+               sendMessage(`Olá, *${res.name}*!`)
+               ConfigSingleton.set(msg.chat.id, res._id)
+               requestBot(msg, res._id)
+           }else{
+               sendMessage("Infelizmente seu cadastro não foi encontrado 🥺")
+           }
+        })
+    }else{
+        requestBot( msg, ConfigSingleton.get( msg.chat.id )  )
+    }
     
-    userService.findOne({chatId: msg.chat.id})
-     .then(res => {
-        console.log('chatBot res',res);
-        
-        if(res){
-            sendMessage(`Olá *${res.name}*!`)
-            requestBot(msg, res._id)
-        }else{
-            sendMessage("Infelizmente seu cadastro não foi encontrado 🥺")
-        }
-     })
 }
 
 const requestBot = (msg, userId) => {
@@ -90,7 +100,7 @@ const requestBot = (msg, userId) => {
             type: "text",
             text: msg.text
         },
-        url: `http://127.0.0.1:3001/api/v1/bots/robo-crypto/converse/${userId}`
+        url: `http://127.0.0.1:3001/api/v1/bots/${BOT_ID}/converse/${userId}`
     }).then(async res => {
         const {responses} = res.data
         
