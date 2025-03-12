@@ -78,7 +78,7 @@ fnRouterConfig({app})
 
 ErrorsHandler(app)
 
-//startPrice()
-//startRSI()
+startPrice()
+startRSI()
 
 module.exports = server
