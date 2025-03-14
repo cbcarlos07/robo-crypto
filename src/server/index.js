@@ -12,11 +12,6 @@ const ErrorsHandler = require('../config/Errors');
 const connect = require('../config/db/connection');
 
 const server = require('http').createServer(app); 
-const telegram = require('../utils/telegram')
-
-const {startPrice} = require('../strategy/price')
-const startRSI = require('../strategy/rsi')
-telegram.start()
 
 connect()
 
@@ -78,7 +73,7 @@ fnRouterConfig({app})
 
 ErrorsHandler(app)
 
-startPrice()
-startRSI()
+//startPrice()
+//startRSI()
 
 module.exports = server

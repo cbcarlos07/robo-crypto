@@ -97,12 +97,13 @@ const start = (strategy, user) => {
         console.log('RSI', rsi);
         content += `RSI: ${rsi}\n`
         console.log('Já comprei', isOpened);
+        const RSIMIN = strategy.buyPrice
+        const RSIMAX = strategy.sellPrice
         
         
         
         
-        
-        if( rsi < 30 && !isOpened ){
+        if( rsi < RSIMIN && !isOpened ){
             console.log('Sobrevendido, hora de comprar');
             isOpened = true
             //saveEnvVariable('IS_OPENED_RSI', isOpened);
@@ -119,7 +120,7 @@ const start = (strategy, user) => {
                 errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
                 reject({})
             })
-        }else if( rsi > 70 && isOpened ){
+        }else if( rsi > RSIMAX && isOpened ){
             console.log('Sobrecomprado, hora de Vender');
             content += `Vender\n\n`
             save(content)

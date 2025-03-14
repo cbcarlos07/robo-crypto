@@ -51,7 +51,7 @@ class UserService extends BaseService{
                 obj = {name, email, username} 
                 statusCode = 200
                 status = true                    
-                token = jwt.sign( obj, JWT_SECRET, { expiresIn: 60 * 60 * 24 }  )
+                token = jwt.sign( obj, JWT_SECRET  )
                 refreshToken = jwt.sign( obj, JWT_SECRET, { expiresIn: '7d' }  )
                 msg = undefined
             }

@@ -8,6 +8,8 @@ class BalanceService extends BaseService {
     }
 
     sum(id){
+        console.log('sum',id);
+        
         return this.repository.sum(id)
     }
 }
