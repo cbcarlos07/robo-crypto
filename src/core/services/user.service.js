@@ -18,9 +18,8 @@ class UserService extends BaseService{
     
     getApproved(){
         const params = {
-            approved: true
+            where: {approved: true}
         }
-        
         return super.find(params)
     }
     

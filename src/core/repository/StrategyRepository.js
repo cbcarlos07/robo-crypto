@@ -1,4 +1,4 @@
-const model = require("../../config/db/model/strategy");
+const model = require("../../models/strategy");
 const Repository = require("./Repository");
 
 class StrategyRepository extends Repository{

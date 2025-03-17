@@ -3,10 +3,9 @@ const axios = require('axios')
 const {format} = require('date-fns')
 const { CronJob } = require('cron')
 
-const {save} = require('../utils/file')
+
 const operationService = require('../core/services/operation.service')
-const connect = require('../config/db/connection')
-const errorService = require('../core/services/error.service')
+
 const newOrder = require('../utils/order')
 const telegram = require('../utils/telegram')
 const calculateProfit = require('../utils/calculateProfit')
@@ -14,11 +13,9 @@ const prepareMsg = require('../utils/prepareMsg')
 const balanceService = require('../core/services/balance.service')
 const UserService = require('../core/services/user.service')
 const strategyService = require('../core/services/strategy.service')
-const { IS_OPENED_RSI, API_URL } = process.env
-let lastBuyOrder = null;
-const SYMBOL = 'BTCUSDT'
-const PERIOD = 14
-const QUANTITY = '0.001'
+const { IS_OPENED_RSI } = process.env
+
+
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
 //'https://testnet.binance.vision'; //https://api.binance.com
 const STRATEGY = 'RSI'
@@ -71,17 +68,18 @@ const RSI = (prices, period) => {
 
 
 
-const start = (strategy, user) => {
+const start = strategy => {
     return new Promise(async(resolve, reject)=>{
+        const user = strategy._user
         const symbol = strategy.symbol
-        const buyPrice = strategy.buyPrice
-        const sellPrice = strategy.sellPrice
+        const production = user.url.includes('api')
         const quantity = strategy.quantity
         const period = strategy.period
         
         
         
         console.clear()
+        console.log('production',production);
         console.log('Estratégia RSI');
         console.log('IS_OPENED_RSI',isOpened);
         
@@ -104,24 +102,17 @@ const start = (strategy, user) => {
         
         
         
-        newOrder.newOrder(symbol, quantity, SIDE.SELL, user).then(data =>{
+        newOrder.newOrder(symbol, quantity, SIDE.SELL, user).then(async data =>{
             const profitResult = calculateProfit(data, data);
             const content = prepareMsg({...profitResult, strategy: 'RSI'})
-            balanceService.save({...profitResult, userId: strategy.userId})
-            strategyService.update(strategy.id, {isOpened: true})
+            balanceService.create({...profitResult, userId: strategy.userId, production})
+            strategyService.update({id: strategy.id}, {isOpened: true})
             telegram.sendMessage( content )
             setTimeout(() => {
                 process.exit(0)    
             }, 2000);
             
-            operationService.save({...data,userId: strategy.userId, strategy: STRATEGY})
-            .then(data => {
-                console.log('data',data)
-                
-            })
-            .catch(err => {
-                console.log('err',err)
-            })
+            await operationService.create({...data,userId: strategy.userId, strategy: STRATEGY})
         })
         
     })
@@ -132,62 +123,47 @@ const start = (strategy, user) => {
 
 //setInterval(start,3000)
 const startRSI = () => {
-    
-    
-    
-    connect()
-    .then(()=> {                    
-        console.log('Conectado ao MongoDB!');
-        const job = new CronJob(
-            '*/10 * * * * *',
-            async () => {
+    require('../config/database/init')
+    const job = new CronJob(
+        '*/10 * * * * *',
+        async () => {
+            
+            UserService.getApproved()
+            .then(async resp => {
                 
-                UserService.getApproved()
-                .then(async resp => {
+                resp.forEach(async _u => {
+                    const u = _u.dataValues
+                    telegram.setSetChatId( u.chatId )
                     
-                    resp.forEach(async u => {
+                    const strategy = await strategyService.find({userId: u.id, strategy: 'RSI', active: true})
+                    strategy.forEach(element => {
+                        isOpened = element.isOpened
                         
-                        telegram.setSetChatId( u.chatId )
-                        
-                        const strategy = await strategyService.find({userId: u._id, strategy: 'RSI', active: true})
-                        strategy.forEach(element => {
-                            isOpened = element.isOpened
-                            
-                            start(element, u)
-                            .then(()=>console.log('Operaçao realizada'))
-                            .catch(e=> {
-                                console.log('Falha',e.message);
-                                job.stop()
-                                setTimeout(() => {
-                                    console.log('Tentanto novamente');
-                                    
-                                    startRSI()
-                                }, 5000);
-                            })
-                            
-                            
+                        start(element)
+                        .then(()=>console.log('Operaçao realizada'))
+                        .catch(e=> {
+                            console.log('Falha',e.message);
+                            job.stop()
+                            setTimeout(() => {
+                                console.log('Tentanto novamente');
+                                
+                                startRSI()
+                            }, 5000);
                         })
+                        
+                        
                     })
-                    
                 })
-            },
-            null, // onComplete
-            true, // start
-            'America/Sao_Paulo' // ajuste para seu fuso horário
-            
-        )
+                
+            })
+        },
+        null, // onComplete
+        true, // start
+        'America/Sao_Paulo' // ajuste para seu fuso horário
         
-    }).catch(e => {
-        console.error('Erro ao conectar ao MongoDB:', e.message)
-        console.log('Tentaremos novamente em 1 minuto');
-        setTimeout(() => {
-            console.log('Tentando novamente');
-            
-            startRSI()
-        }, 5000);
+    )
         
-    })
-    
+ 
 }
 
 

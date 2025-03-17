@@ -5,7 +5,7 @@ const { default: axios } = require('axios')
 
 const { save, errorFn } = require('../utils/file')
 
-const { API_KEY, SECRET_KEY, API_URL } = process.env
+
 //const API_URL = 'https://testnet.binance.vision' //'https://testnet.binance.vision'; //https://api.binance.com
 
 const newOrder = (symbol, quantity, side, user) => {
@@ -30,7 +30,7 @@ const newOrder = (symbol, quantity, side, user) => {
                                             headers: {'X-MBX-APIKEY' : user.apiKey}
                                         }
                                     )
-            console.log(data);
+            
             const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
             save( `${JSON.stringify( {...data, date},null, 2 )}\n\n` )
             resolve({...data, date})

@@ -4,8 +4,12 @@ class BaseService{
         this.repository = _repository
     }
 
-    save(data){
-        return this.repository.save(data)
+    create(data){
+        return this.repository.create(data)
+    }
+
+    bulkCreate(data){
+        return this.repository.bulkCreate(data)
     }
 
     update(id, data){
@@ -17,19 +21,46 @@ class BaseService{
     }
 
     find(data){
-        return this.repository.find(data);
+        return this.repository.findAll(data);
+    }
+
+    findAll(data){
+        return this.repository.findAll(data);
     }
     
     findOne(data){
         return this.repository.findOne(data);
     }
 
-    delete(data){
-        return this.repository.delete(data)
+    delete(id){
+        return this.repository.delete(id)
     }
 
-    findOneAndUpdate(data){
-        return this.repository.findOneAndUpdate(data)
+    getTotal(params = null){
+        return this.repository.getTotal(params)
+    }
+
+    pagination(params, paramsTotal = null){
+        return new Promise(async(resolve, reject)=>{
+            try {
+                const total = await this.getTotal(paramsTotal)
+                const result = await this.repository.paginate(params)
+                const {page, limit} = params
+                resolve({
+                    page,
+                    total,
+                    totalPage: calculateTotalPages(total, limit),
+                    rows: result.rows
+                })
+                
+            } catch (error) {
+                reject(error)
+            }
+        })
+    }
+
+    paginate(params){
+        return this.pagination(params)
     }
 }
 

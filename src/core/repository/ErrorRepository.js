@@ -1,4 +1,4 @@
-const model = require("../../config/db/model/error");
+const model = require("../../models//error");
 const Repository = require("./Repository");
 
 class ErrorRepository extends Repository{

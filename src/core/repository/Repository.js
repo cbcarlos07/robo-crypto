@@ -1,59 +1,66 @@
-const {format} = require('date-fns')
+
 class Repository {
 
-    constructor(model){
-        this.model = model
+    constructor(_model){
+        this.model = _model
     }
 
-    save(data){
-        const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
-        const info = new this.model( {...data, date} )
-        return info.save(  )
+    create(data){
+        return this.model.create(data)
+    }
+
+    bulkCreate(data){
+        return this.model.bulkCreate(data)
     }
 
     update(id, data){
-        return this.model.findByIdAndUpdate(
-            id,
-            {
-                $set: data
-            },
-            { new: true }
-        );
-        
+        return this.model.update(data, {where: id})
+    }
+
+    delete(id){
+        return this.model.destroy({where: {id}})
     }
 
     findById(id){
-        return this.model.findById(id);
+        return this.model.findByPk(id)
     }
 
-    find(data){
-        return this.model.find(data);
+    findAll(params){
+        return this.model.findAll({...params})
     }
     
     findOne(data){
-        return this.model.findOne(data);
-    }
-    
-    delete(data){
-        return this.model.deleteOne(data)
+        const {params, _include} = data
+        const where = params ? params : {}
+        const include = _include ? _include : null
+        return this.model.findOne({where, include})
     }
 
-    findOneAndUpdate(data){
-        console.log('findOneAndUpdate data',data);
-        
-        return this.model.findOneAndUpdate(
-            { ...data.valueFind }, 
-            { $setOnInsert: { 
-                ...data.value,
-                ...data.valueFind  
-                } 
-            },
-            { 
-                upsert: true,
-                new: true
-            }
-        )
+    getTotal(params = null){
+        return this.model.count(params)
     }
+
+    paginate(param){
+        const {name, page, limit, field, _include, _order, additionalParam} = param
+        const curpage = ( page - 1 ) * limit
+        const _params = name ? { [field]: {[Op.like]: `%${name}%`}, ...additionalParam } : {...additionalParam}
+        const include = _include ? _include : []
+        const order = _order ? _order : field ? [field] : []
+        const params =  _params
+        
+        
+        return this.model.findAndCountAll({
+            where: {
+                ...params
+            },
+            include,
+            limit,
+            offset: curpage,
+            order
+        })
+    }
+
+   
 }
 
 module.exports = Repository

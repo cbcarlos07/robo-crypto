@@ -3,9 +3,8 @@ const { CronJob } = require('cron')
 const axios = require('axios')
 const { format } = require('date-fns')
 
-const connect = require('../config/db/connection')
 const operationService = require('../core/services/operation.service')
-const { saveEnvVariable } = require('../utils/file')
+
 const newOrder = require('../utils/order')
 const errorService = require('../core/services/error.service')
 const calculateProfit = require('../utils/calculateProfit')
@@ -15,26 +14,24 @@ const telegram = require('../utils/telegram')
 const UserService = require('../core/services/user.service')
 const strategyService = require('../core/services/strategy.service')
 
-const SYMBOL = 'BTCUSDT'
-const BUY_PRICE = 97142
-const SELL_PRICE = 98003
-const QUANTITY = '0.001'
+
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
 const STRATEGY = 'PRICE'
-const { IS_OPENED_PRICE, API_URL } = process.env
+
 //const API_URL = 'https://testnet.binance.vision'; //https://api.binance.com
 
-let isOpened = IS_OPENED_PRICE == 'true'
+let isOpened = false
 let lastBuyOrder = null;
 
-const start = (strategy,user) => {
+const start = strategy => {
     return new Promise(async(resolve,reject)=> {
-        
+        const user = strategy._user
         console.clear()
         const symbol = strategy.symbol
         const buyPrice = strategy.buyPrice
         const sellPrice = strategy.sellPrice
         const quantity = strategy.quantity
+        const production = user.url.includes('api')
         
         console.log('Estratégia PRECO');
         const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
@@ -60,7 +57,7 @@ const start = (strategy,user) => {
             isOpened = true
             console.log('isOpened',isOpened);
             
-            const strategyUpdated = await strategyService.update(strategy._id, {isOpened})
+            const strategyUpdated = await strategyService.update({id: strategy.id}, {isOpened})
             console.log('strategyUpdated', strategyUpdated);
             
             
@@ -83,18 +80,18 @@ Quantidade: *${qtd}*
 Total: *${total}*
             `
                 telegram.sendMessage( conteMsg )
-                operationService.save({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
+                operationService.create({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
                 .then(d => {
                     console.log('salvou operacao', d)
                     resolve({})
                 })
             })
             .catch(err => {
-                errorService.save({...err, strategy: STRATEGY})
+                errorService.create({...err, strategy: STRATEGY})
                 reject(err)
             })
             
-            //await operationService.save( {...obj, side: SIDE.BUY} )
+            //await operationService.create( {...obj, side: SIDE.BUY} )
             console.log('----------------------------------------------');
         }else if( price >= sellPrice && isOpened ){
             console.log('----------------------------------------------');
@@ -105,7 +102,7 @@ Total: *${total}*
             isOpened = false
             console.log('isOpened',isOpened);
             
-            const strategyUpdated = await strategyService.update(strategy._id, {isOpened})
+            const strategyUpdated = await strategyService.update({id: strategy.id}, {isOpened})
             console.log('strategyUpdated', strategyUpdated);
             newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
             .then(async data => {
@@ -119,15 +116,15 @@ Total: *${total}*
                     console.log('quntidade',`$${profitResult.quantity}`)
                     console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
                     console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
-                    balanceService.save({...profitResult, userId: strategy.userId})
+                    balanceService.create({...profitResult, userId: strategy.userId, production})
                     
                     lastBuyOrder = null
                 }    
-                await operationService.save({...data, strategy: STRATEGY})
+                await operationService.create({...data, strategy: STRATEGY})
                 resolve({})
             })
             .catch(err => {
-                errorService.save({...err, userId: strategy.userId, strategy: STRATEGY})
+                errorService.create({...err, userId: strategy.userId, strategy: STRATEGY})
                 reject(err)
             })
             console.log('----------------------------------------------');
@@ -148,61 +145,47 @@ Total: *${total}*
 //setInterval(start,3000)
 
 const startPrice = async () => {
-    
-    
-    connect()
-    .then(() => {
+    require('../config/database/init')
         
-        console.log('Conectado ao MongoDB!');
-        const job = new CronJob(
-            '*/10 * * * * *',
-            async () => {
-                UserService.getApproved()
-                .then(async resp => {
-                    resp.forEach(async u => {
-                        
-                        telegram.setSetChatId( u.chatId )
-                        
-                        const strategy = await strategyService.find({userId: u._id, strategy: 'PRICE', active: true})
-                        
-                        strategy.forEach(element => {
-                            isOpened = element.isOpened
-                            
-                            
-                            start(element, u)
-                            .then(()=>console.log('Operaçao realizada'))
-                            .catch(e=> {
-                                console.log('Falha',e.message);
-                                job.stop()
-                                setTimeout(() => {
-                                    startPrice()
-                                }, 5000);
-                            })
-                            
-                            
-                        });
-                    })
+    const job = new CronJob(
+        '*/10 * * * * *',
+        async () => {
+            UserService.getApproved()
+            .then(async resp => {
+                resp.forEach(async _u => {
+                    const u = _u.dataValues
+                    telegram.setSetChatId( u.chatId )
                     
+                    const strategy = await strategyService.find({userId: u.id, strategy: 'PRICE', active: true})
+                    
+                    strategy.forEach(element => {
+                        isOpened = element.isOpened
+                        
+                        
+                        start(element)
+                        .then(()=>console.log('Operaçao realizada'))
+                        .catch(e=> {
+                            console.log('Falha',e.message);
+                            job.stop()
+                            setTimeout(() => {
+                                startPrice()
+                            }, 5000);
+                        })
+                        
+                        
+                    });
                 })
                 
-            },
-            null, // onComplete
-            true, // start
-            'America/Sao_Paulo' // ajuste para seu fuso horário
+            })
             
-        )
+        },
+        null, // onComplete
+        true, // start
+        'America/Sao_Paulo' // ajuste para seu fuso horário
         
-    }).catch(e => {
+    )
         
-        console.error('Erro ao conectar ao MongoDB:', e.message);
-        console.log('Tentaremos depois de 1 minuto');
-        
-        setTimeout(() => {
-            console.log('Tentando novamente');
-            startPrice()
-        }, 5000);
-    })
-    
+   
     
 }
 

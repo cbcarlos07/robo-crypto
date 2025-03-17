@@ -1,4 +1,4 @@
-const model = require("../../config/db/model/balance");
+const model = require("../../models/balance");
 const Repository = require("./Repository");
 
 class BalanceRSIRepository extends Repository{
@@ -7,22 +7,17 @@ class BalanceRSIRepository extends Repository{
     }
 
     sum(userId){
-        return this.model.aggregate([
-              {
-                $match: {
-                    userId
-                }
-            },
-            {
-              $group: {
-                _id: null,
-                totalProfit: { $sum: '$profit' },
-                totalPercentageProfit: { $sum: '$percentageProfit' },
-                totalItems: { $sum: 1 }
-              }
-            }
-          ]
-        )
+      Balance.findAll({
+        attributes: [
+            'production',
+            'userId',
+            [Sequelize.fn('SUM', Sequelize.col('profit')), 'totalProfit'],
+            [Sequelize.fn('SUM', Sequelize.col('percentageProfit')), 'totalPercentageProfit']
+        ],
+        where: {userId},
+        group: ['production', 'userId'], // Agrupando por production e userId
+        raw: true // Para obter resultados sem a estrutura do modelo
+    });
     }
 }
 

@@ -3,7 +3,7 @@ const { CronJob } = require('cron')
 const axios = require('axios')
 const { format } = require('date-fns')
 
-const connect = require('../config/db/connection')
+
 const operationService = require('../core/services/operation.service')
 
 const newOrder = require('../utils/order')
@@ -15,27 +15,23 @@ const telegram = require('../utils/telegram')
 const UserService = require('../core/services/user.service')
 const strategyService = require('../core/services/strategy.service')
 
-const SYMBOL = 'BTCUSDT'
-const BUY_PRICE = 97142
-const SELL_PRICE = 98003
-const QUANTITY = '0.001'
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
 const STRATEGY = 'PRICE'
-const { IS_OPENED_PRICE, API_URL } = process.env
+const { IS_OPENED_PRICE } = process.env
 //const API_URL = 'https://testnet.binance.vision'; //https://api.binance.com
 
 let isOpened = IS_OPENED_PRICE == 'true'
 let lastBuyOrder = null;
 
-const start = (strategy,user) => {
+const start = strategy => {
     return new Promise(async(resolve,reject)=> {
-        
+        const user = strategy._user
         console.clear()
         const symbol = strategy.symbol
         const buyPrice = strategy.buyPrice
         const sellPrice = strategy.sellPrice
         const quantity = strategy.quantity
-        
+        const production = user.url.includes('api')
         console.log('Estratégia PRECO');
         const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
         
@@ -58,7 +54,7 @@ const start = (strategy,user) => {
         console.log('Preço',_price);
         console.log('Qtde',qtd);
         console.log('Total',total);
-        const save1 = await operationService.save({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
+        const save1 = await operationService.create({...valueBuy, userId: strategy.userId, strategy: STRATEGY})
         console.log('save1',save1);
         
         
@@ -72,14 +68,14 @@ const start = (strategy,user) => {
             console.log('quntidade',`$${profitResult.quantity}`)
             console.log('Lucro/prejuizo',`$${profitResult.profit.toFixed(2)}`)
             console.log('Percentual',`$${profitResult.percentageProfit.toFixed(2)}`)
-            balanceService.save({...profitResult,userId: strategy.userId })
+            balanceService.create({...profitResult,userId: strategy.userId, production })
             
             lastBuyOrder = null
             
             
         }
         
-        await operationService.save({...valueSell, userId: strategy.userId, strategy: STRATEGY})
+        await operationService.create({...valueSell, userId: strategy.userId, strategy: STRATEGY})
         
         setTimeout(() => {
             process.exit(0)
@@ -96,58 +92,43 @@ const start = (strategy,user) => {
 
 const startPrice = async () => {
     
-    connect()
-    .then(() => {
-        console.log('Conectado ao MongoDB!');
-        const job = new CronJob(
-            '*/10 * * * * *',
-            async () => {
-                UserService.getApproved()
-                .then(async resp => {
-                    resp.forEach(async u => {
-                        telegram.setSetChatId( u.chatId )
+    require('../config/database/init')
+
+    const job = new CronJob(
+        '*/10 * * * * *',
+        async () => {
+            UserService.getApproved()
+            .then(async resp => {
+                resp.forEach(async _u => {
+                    const u = _u.dataValues
+                    telegram.setSetChatId( u.chatId )
+                    
+                    const strategy = await strategyService.find({userId: u.id, strategy: 'PRICE', active: true})
+                    
+                    strategy.forEach(element => {
+                        isOpened = element.isOpened
                         
-                        const strategy = await strategyService.find({userId: u._id, strategy: 'PRICE', active: true})
+                        start(element)
+                        .then(()=>console.log('Operaçao realizada'))
+                        .catch(e=> {
+                            console.log('Falha',e.message);
+                            job.stop()
+                            setTimeout(() => {
+                                startPrice()
+                            }, 5000);
+                        })
                         
-                        strategy.forEach(element => {
-                            isOpened = element.isOpened
-                            
-                            
-                            console.log('user', u);
-                            
-                            start(element, u)
-                            .then(()=>console.log('Operaçao realizada'))
-                            .catch(e=> {
-                                console.log('Falha',e.message);
-                                job.stop()
-                                setTimeout(() => {
-                                    startPrice()
-                                }, 5000);
-                            })
-                            
-                        });
-                        
-                    })
+                    });
                     
                 })
-            },
-            null, // onComplete
-            true, // start
-            'America/Sao_Paulo' // ajuste para seu fuso horário
-            
-        )
+                
+            })
+        },
+        null, // onComplete
+        true, // start
+        'America/Sao_Paulo' // ajuste para seu fuso horário
         
-    }).catch(e => {
-        
-        console.error('Erro ao conectar ao MongoDB:', e.message);
-        console.log('Tentaremos depois de 1 minuto');
-        
-        setTimeout(() => {
-            console.log('Tentando novamente');
-            startPrice()
-        }, 5000);
-    })
-    
+    )
     
     
 }
