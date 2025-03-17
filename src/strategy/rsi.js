@@ -72,10 +72,10 @@ const RSI = (prices, period) => {
 
 const start = strategy => {
     return new Promise(async(resolve, reject)=>{
-        const user = strategy._user
+        
         const symbol = strategy.symbol
         
-        const production = user.url.includes('api')
+        const production = strategy.url.includes('api')
         const quantity = strategy.quantity
         const period = strategy.period
         console.clear()
@@ -84,7 +84,7 @@ const start = strategy => {
         
         
         let content = ''
-        const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
+        const { data } = await axios.get(`${strategy.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
         
         
         const candle = data[ data.length - 1 ]
@@ -114,7 +114,7 @@ const start = strategy => {
             strategyService.update({id: strategy.id}, {isOpened})
             content += `Comprar\n\n`
             save(content)
-            newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
+            newOrder.newOrder(symbol, quantity, SIDE.BUY, strategy)
             .then(async data => {
                 lastBuyOrder = data
                 await operationService.create({...data, userId: strategy.userId, strategy: STRATEGY}) 
@@ -131,7 +131,7 @@ const start = strategy => {
             isOpened = false
             //saveEnvVariable('IS_OPENED_RSI', isOpened);
             strategyService.update(strategy.id, {isOpened})
-            newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
+            newOrder.newOrder(symbol, quantity, SIDE.SELL, strategy)
             .then(async data => {
                 if( lastBuyOrder ){
                     const profitResult = calculateProfit(lastBuyOrder, data);

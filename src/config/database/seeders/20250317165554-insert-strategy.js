@@ -16,6 +16,7 @@ module.exports = {
               quantity: '0.001',
               userId: 1,
               active: true,
+              url: 'https://testnet.binance.vision',
               createdAt: fn('NOW'),
               updatedAt: fn('NOW')
             },
@@ -29,6 +30,7 @@ module.exports = {
               userId: 1,
               active: true,
               period: 14,
+              url: 'https://testnet.binance.vision',
               createdAt: fn('NOW'),
               updatedAt: fn('NOW')
             },

@@ -8,9 +8,9 @@ const { save, errorFn } = require('../utils/file')
 
 //const API_URL = 'https://testnet.binance.vision' //'https://testnet.binance.vision'; //https://api.binance.com
 
-const newOrder = (symbol, quantity, side, user) => {
+const newOrder = (symbol, quantity, side, strategy) => {
     return new Promise(async (resolve, reject)=>{
-
+        const user = strategy._user
         const order = {symbol, quantity, side}
         order.type = 'MARKET'
         order.timestamp = await getBinanceServerTime(user)
@@ -24,7 +24,7 @@ const newOrder = (symbol, quantity, side, user) => {
     
         try {
             const { data } = await axios.post(
-                                        `${user.url}/api/v3/order`,
+                                        `${strategy.url}/api/v3/order`,
                                         new URLSearchParams(order).toString(),
                                         {
                                             headers: {'X-MBX-APIKEY' : user.apiKey}

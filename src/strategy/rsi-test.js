@@ -70,9 +70,9 @@ const RSI = (prices, period) => {
 
 const start = strategy => {
     return new Promise(async(resolve, reject)=>{
-        const user = strategy._user
+        
         const symbol = strategy.symbol
-        const production = user.url.includes('api')
+        const production = strategy.url.includes('api')
         const quantity = strategy.quantity
         const period = strategy.period
         
@@ -84,7 +84,7 @@ const start = strategy => {
         console.log('IS_OPENED_RSI',isOpened);
         
         let content = ''
-        const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
+        const { data } = await axios.get(`${strategy.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
         const candle = data[ data.length - 1 ]
         const lastPrice = parseFloat( candle[4] ) 
         const date = format(new Date(), "dd/MM/yyyy HH:mm:ss") 
@@ -102,7 +102,7 @@ const start = strategy => {
         
         
         
-        newOrder.newOrder(symbol, quantity, SIDE.SELL, user).then(async data =>{
+        newOrder.newOrder(symbol, quantity, SIDE.SELL, strategy).then(async data =>{
             const profitResult = calculateProfit(data, data);
             const content = prepareMsg({...profitResult, strategy: 'RSI'})
             balanceService.create({...profitResult, userId: strategy.userId, production})

@@ -19,7 +19,6 @@ module.exports = {
               dtApproved: fn('NOW'),
               apiKey: 'MSHfKzRyNzU6PmAAVgWFllzQg4sRWHvgaqCFwzxDpWqxN1cXD9X9kjqIjF133NLS',
               secretKey: '2TO5XBYYGRNa6szJhWxGeqaZG6T7FQPoaxTTubPsqCm7GRfWVU47XEL7XBYP0MXH',
-              url: 'https://testnet.binance.vision',
               obs: '-',
             },
             

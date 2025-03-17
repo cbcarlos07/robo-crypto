@@ -25,16 +25,16 @@ let lastBuyOrder = null;
 
 const start = strategy => {
     return new Promise(async(resolve,reject)=> {
-        const user = strategy._user
+        
         console.clear()
         const symbol = strategy.symbol
         const buyPrice = strategy.buyPrice
         const sellPrice = strategy.sellPrice
         const quantity = strategy.quantity
-        const production = user.url.includes('api')
+        const production = strategy.url.includes('api')
         
         console.log('Estratégia PRECO');
-        const { data } = await axios.get(`${user.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
+        const { data } = await axios.get(`${strategy.url}/api/v3/klines?limit=100&interval=15m&symbol=${symbol}`)
         
         
         const candle = data[ data.length - 1 ]
@@ -62,7 +62,7 @@ const start = strategy => {
             
             
             
-            newOrder.newOrder(symbol, quantity, SIDE.BUY, user)
+            newOrder.newOrder(symbol, quantity, SIDE.BUY, strategy)
             .then(valueBuy => {
                 lastBuyOrder = valueBuy
                 const _price = valueBuy.fills[0].price
@@ -104,7 +104,7 @@ Total: *${total}*
             
             const strategyUpdated = await strategyService.update({id: strategy.id}, {isOpened})
             console.log('strategyUpdated', strategyUpdated);
-            newOrder.newOrder(symbol, quantity, SIDE.SELL, user)
+            newOrder.newOrder(symbol, quantity, SIDE.SELL, strategy)
             .then(async data => {
                 if( lastBuyOrder ){
                     const profitResult = calculateProfit(lastBuyOrder, data);

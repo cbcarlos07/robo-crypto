@@ -14,7 +14,6 @@ class User extends Sequelize.Model {
         dtApproved: Sequelize.DATE,
         apiKey: Sequelize.STRING,
         secretKey: Sequelize.STRING,
-        url: Sequelize.STRING,
         obs: Sequelize.STRING,
       },
       {

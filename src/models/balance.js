@@ -12,6 +12,7 @@ class Balance extends Sequelize.Model {
         profit: Sequelize.DOUBLE,
         percentageProfit: Sequelize.DOUBLE,
         production: Sequelize.BOOLEAN,
+        url: Sequelize.STRING,
         userId: { 
             type: Sequelize.INTEGER,
             allowNull: false,
