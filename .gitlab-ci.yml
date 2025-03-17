@@ -52,7 +52,7 @@ deploy_prd:
     - cd $SOURCE/back-end/$CI_COMMIT_BRANCH && npm i
     - cd $SOURCE/back-end/$CI_COMMIT_BRANCH
     - cp ../config/env .env
-    - cp ../config/sequelize .sequelizerc
+    - cp ../config/sequelizerc .sequelizerc
     - npm run restart:db
     - pm2 reload $PROJECT
   artifacts:
