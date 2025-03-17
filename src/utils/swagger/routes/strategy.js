@@ -36,6 +36,10 @@
  *           type: boolean
  *           description: status da estratégia
  *           example: true
+ *         url: 
+ *           type: string
+ *           description: Secret key da binance 
+ *           example: https://testnet.binance.vision
  *     PriceStrategy:
  *       required: [buyPrice, sellPrice]
  *       properties:

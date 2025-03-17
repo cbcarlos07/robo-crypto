@@ -45,10 +45,6 @@
  *           type: string
  *           description: Secret key da binance 
  *           example: 2TO5XBYYGRNa6szJhWxGeqaZG6T7FQPoaxTTubPsqCm7GRfWVU47XEL7XBYP0=
- *         url: 
- *           type: string
- *           description: Secret key da binance 
- *           example: https://testnet.binance.vision
  *         obs: 
  *           type: string
  *           description: Alguma observação
