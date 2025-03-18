@@ -20,7 +20,7 @@ class BaseController {
 
     update(req,res,next){
         const {id} = req.params
-        return this.service.update(id, req.body)
+        return this.service.update({id}, req.body)
         .then(() => {
              res.status(this.StatusCodes.OK).json({msg: this.messages.updated})
         })
