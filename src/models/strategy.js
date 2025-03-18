@@ -32,6 +32,7 @@ class Strategy extends Sequelize.Model {
         quantity: Sequelize.STRING,
         period: Sequelize.INTEGER,
         active: {type: Sequelize.BOOLEAN, defaultValue: false},
+        url: Sequelize.STRING,
         userId: { 
             type: Sequelize.INTEGER,
             allowNull: false,

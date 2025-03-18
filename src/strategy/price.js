@@ -13,7 +13,7 @@ const prepareMsg = require('../utils/prepareMsg')
 const telegram = require('../utils/telegram')
 const UserService = require('../core/services/user.service')
 const strategyService = require('../core/services/strategy.service')
-
+const wait = require('../utils/wait')
 
 const SIDE = {BUY: 'BUY', SELL: 'SELL'}
 const STRATEGY = 'PRICE'

@@ -14,7 +14,7 @@ const prepareMsg = require('../utils/prepareMsg')
 const balanceService = require('../core/services/balance.service')
 const UserService = require('../core/services/user.service')
 const strategyService = require('../core/services/strategy.service')
-const wait = require('../utils/wait')
+
 
 let lastBuyOrder = null;
 
@@ -74,11 +74,11 @@ const start = strategy => {
     return new Promise(async(resolve, reject)=>{
         
         const symbol = strategy.symbol
+        console.clear()
         
         const production = strategy.url.includes('api')
         const quantity = strategy.quantity
         const period = strategy.period
-        console.clear()
         console.log('Estratégia RSI');
         console.log('IS_OPENED_RSI',isOpened);
         
