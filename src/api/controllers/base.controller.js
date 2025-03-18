@@ -9,7 +9,7 @@ class BaseController {
     }
 
     save(req,res,next){
-        this.service.save(req.body)
+        this.service.create(req.body)
                     .then(resp => {
                         res.status(this.StatusCodes.CREATED).json({data: resp, msg: this.messages.created})
                     })
@@ -51,8 +51,8 @@ class BaseController {
     }
     
     delete(req,res,next){
-        const {id: _id} = req.params
-        this.service.delete({_id})
+        const {id} = req.params
+        this.service.delete(id)
                     .then(() => {
                         res.status(this.StatusCodes.OK).json(this.messages.removed)
                     })
