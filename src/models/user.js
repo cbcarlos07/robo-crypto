@@ -12,8 +12,6 @@ class User extends Sequelize.Model {
         agree: Sequelize.BOOLEAN,
         approved: Sequelize.BOOLEAN,
         dtApproved: Sequelize.DATE,
-        apiKey: Sequelize.STRING,
-        secretKey: Sequelize.STRING,
         obs: Sequelize.STRING,
       },
       {

@@ -17,6 +17,8 @@ module.exports = {
               userId: 1,
               active: true,
               url: 'https://testnet.binance.vision',
+              apiKey: 'MSHfKzRyNzU6PmAAVgWFllzQg4sRWHvgaqCFwzxDpWqxN1cXD9X9kjqIjF133NLS',
+              secretKey: '2TO5XBYYGRNa6szJhWxGeqaZG6T7FQPoaxTTubPsqCm7GRfWVU47XEL7XBYP0MXH',
               createdAt: fn('NOW'),
               updatedAt: fn('NOW')
             },
@@ -31,6 +33,8 @@ module.exports = {
               active: true,
               period: 14,
               url: 'https://testnet.binance.vision',
+              apiKey: 'MSHfKzRyNzU6PmAAVgWFllzQg4sRWHvgaqCFwzxDpWqxN1cXD9X9kjqIjF133NLS',
+              secretKey: '2TO5XBYYGRNa6szJhWxGeqaZG6T7FQPoaxTTubPsqCm7GRfWVU47XEL7XBYP0MXH',
               createdAt: fn('NOW'),
               updatedAt: fn('NOW')
             },

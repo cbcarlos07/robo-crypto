@@ -53,7 +53,7 @@ deploy_prd:
     - cd $SOURCE/back-end/$CI_COMMIT_BRANCH
     - cp ../config/env .env
     - cp ../config/sequelizerc .sequelizerc
-   # - npm run restart:db
+    - npm run restart:db
     - pm2 reload $PROJECT
   artifacts:
     expire_in: 1 day

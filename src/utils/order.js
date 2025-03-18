@@ -16,7 +16,7 @@ const newOrder = (symbol, quantity, side, strategy) => {
         order.timestamp = await getBinanceServerTime(user)
     
         const signature = crypto
-                            .createHmac('sha256', user.secretKey )
+                            .createHmac('sha256', strategy.secretKey )
                             .update( new URLSearchParams(order).toString() )
                             .digest('hex')
     
@@ -27,7 +27,7 @@ const newOrder = (symbol, quantity, side, strategy) => {
                                         `${strategy.url}/api/v3/order`,
                                         new URLSearchParams(order).toString(),
                                         {
-                                            headers: {'X-MBX-APIKEY' : user.apiKey}
+                                            headers: {'X-MBX-APIKEY' : strategy.apiKey}
                                         }
                                     )
             
