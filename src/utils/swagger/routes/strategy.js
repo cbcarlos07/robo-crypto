@@ -29,9 +29,9 @@
  *           description: Símbolo da moeda
  *           example: BTCUSDT
  *         userId:
- *           type: string
+ *           type: number
  *           description: Id do usuario
- *           example: 67b4e238ea078d279a373f86
+ *           example: 1
  *         active:
  *           type: boolean
  *           description: status da estratégia
