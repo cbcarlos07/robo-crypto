@@ -172,7 +172,6 @@ const startRSI = () => {
     const job = new CronJob(
         '*/10 * * * * *',
         async () => {
-            
             UserService.getApproved()
             .then(async resp => {
                 resp.forEach(async _u => {
